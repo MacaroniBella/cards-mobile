@@ -4,13 +4,13 @@ A phone-first companion to your desktop dashboard. It reads and writes **live** 
 same master Google Sheet, through the **same Apps Script Web App** the desktop already uses —
 so there's nothing new to set up on the data side and no second source of truth.
 
-On your phone you can:
+It mirrors the full desktop dashboard — five tabs, same data, same actions:
 
-- **Browse facts** synced live from the sheet, filtered by card status
-- **Assign facts to decks** (tap deck chips on each fact)
-- **Rewrite facts** into the final card Question / Answer
-- **Add deck ideas** on the go → writes to the `Decks` tab
-- **Add sources** you find day to day → writes to the `Sources` tab
+- **Dashboard** — stat cards plus focus-deck progress and open-tasks preview
+- **Tasks** — add / edit / delete; title, description, due date, category, owner, status, linked decks; filter by search / status / category
+- **Decks** — add / edit / delete; title, subtitle, description, **status (focus / planned / complete)**, facts count, expansion pages, **tags with autocomplete**; filter by search / status / tag
+- **Facts** — synced live; clickable card-status strip; filter by search / deck / qualifies; per fact: original text, C1–C6 rubric, **searchable deck-assignment** (chips + search list), **rewrite Question / Answer**, card status
+- **Sources** — add / edit / delete; title, type, author, year, publisher, url, isbn, notes, linked decks; citation preview + copy; filter by search / type / deck
 
 It installs to your home screen as an app (PWA) and is 100% free to host on GitHub Pages.
 

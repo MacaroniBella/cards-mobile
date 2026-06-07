@@ -23,11 +23,12 @@ html,body{overscroll-behavior-y:none;}
 body{
   font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
   font-size:15px;line-height:1.45;min-height:100vh;min-height:100dvh;
-  padding-bottom:calc(66px + env(safe-area-inset-bottom));
+  padding-bottom:calc(70px + env(safe-area-inset-bottom));
 }
 h1,h2,h3{font-family:'Playfair Display',serif;}
 button{font-family:inherit;cursor:pointer;}
-input,textarea,select{font-family:inherit;font-size:16px;}/*16px stops iOS zoom*/
+input,textarea,select{font-family:inherit;font-size:16px;}
+a{color:var(--primary);}
 
 /* ── Top bar ── */
 .topbar{
@@ -43,25 +44,32 @@ input,textarea,select{font-family:inherit;font-size:16px;}/*16px stops iOS zoom*
   border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;
 }
 .sync-btn:disabled{opacity:.55;}
-.sync-btn .spin{display:inline-block;}
-.syncing .spin{animation:spin 1s linear infinite;}
+.syncing .spin{display:inline-block;animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── Views ── */
-main{padding:14px 14px 8px;max-width:680px;margin:0 auto;}
+main{padding:14px 14px 8px;max-width:720px;margin:0 auto;}
 .view{display:none;}
 .view.active{display:block;animation:fade .2s;}
 @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
 .view-head{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 12px;}
-.view-head h2{font-size:22px;font-weight:700;}
+.view-head h2{font-size:23px;font-weight:700;}
 .view-head .count{font-size:12px;color:var(--text-muted);font-weight:500;}
 
-/* ── Search + filter ── */
+/* ── Search + filters ── */
 .search{
   width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:11px 14px;font-size:15px;color:var(--text);margin-bottom:10px;
+  padding:11px 14px;font-size:15px;color:var(--text);margin-bottom:8px;
 }
 .search::placeholder{color:var(--text-muted);}
+.filter-row{display:flex;gap:8px;margin-bottom:10px;}
+.filter-row select{flex:1;min-width:0;}
+.mini-sel{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:9px 30px 9px 12px;font-size:14px;color:var(--text);appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%237A5F48' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center;
+}
 .chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-ms-overflow-style:none;}
 .chips::-webkit-scrollbar{display:none;}
 .chip{
@@ -71,22 +79,47 @@ main{padding:14px 14px 8px;max-width:680px;margin:0 auto;}
 .chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
 .chip .n{opacity:.7;font-weight:600;margin-left:4px;}
 
-/* ── Cards / list items ── */
+/* ── List items ── */
 .item{
   background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(44,26,14,.04);
 }
 .item:active{transform:scale(.992);}
 .item-title{font-weight:600;font-size:15px;line-height:1.35;margin-bottom:5px;}
-.item-meta{font-size:12.5px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;}
+.item-meta{font-size:12.5px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:5px 9px;align-items:center;}
 .item-sub{font-size:13.5px;color:var(--text-muted);margin-top:6px;line-height:1.4;}
 .badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:11px;white-space:nowrap;}
-.badge-deck{background:#EAF6F3;color:#1B7A6A;}
-.badge-status{background:var(--surface-alt);color:var(--text-muted);}
-.badge-tag{background:#FBEFE4;color:#9A5A30;}
+.b-deck{background:#EAF6F3;color:#1B7A6A;}
+.b-tag{background:#FBEFE4;color:#9A5A30;}
+.b-cat{background:#EFE9DA;color:#6A5A40;}
+.b-focus{background:#FCE6DF;color:#C0341A;}
+.b-planned{background:#EFE9DA;color:#7A5F48;}
+.b-complete{background:#E3F3EC;color:#1B7A6A;}
+.b-ns{background:#EFE9DA;color:#7A5F48;}
+.b-ip{background:#FDEFD6;color:#9A6A00;}
+.b-blk{background:#FCE0DA;color:#B5341A;}
+.b-done{background:#E3F3EC;color:#1B7A6A;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto;}
 
-.empty{text-align:center;color:var(--text-muted);padding:46px 20px;font-size:14px;}
+/* progress */
+.prog-track{height:6px;background:var(--surface-alt);border-radius:4px;overflow:hidden;margin-top:4px;}
+.prog-fill{height:100%;background:var(--secondary);border-radius:4px;}
+.exp-dots{display:flex;gap:5px;margin-top:5px;}
+.exp-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:transparent;}
+.exp-dot.on{background:var(--secondary);border-color:var(--secondary);color:#fff;}
+
+/* stat cards */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;border-left:4px solid var(--primary);}
+.stat.green{border-left-color:var(--secondary);}
+.stat.amber{border-left-color:var(--accent);}
+.stat.teal{border-left-color:#7ECDC6;}
+.stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);}
+.stat .val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;line-height:1.1;margin:2px 0;}
+.stat .note{font-size:11px;color:var(--text-muted);}
+.section-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin:18px 2px 10px;}
+
+.empty{text-align:center;color:var(--text-muted);padding:42px 20px;font-size:14px;}
 .empty .big{font-size:34px;display:block;margin-bottom:10px;opacity:.5;}
 
 /* ── Bottom nav ── */
@@ -96,29 +129,28 @@ main{padding:14px 14px 8px;max-width:680px;margin:0 auto;}
   padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(44,26,14,.06);
 }
 .tab{
-  flex:1;border:none;background:none;padding:9px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;
-  color:var(--text-muted);font-size:10.5px;font-weight:600;letter-spacing:.02em;
+  flex:1;border:none;background:none;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--text-muted);font-size:10px;font-weight:600;letter-spacing:.01em;
 }
-.tab .ico{font-size:20px;line-height:1;}
+.tab .ico{font-size:19px;line-height:1;}
 .tab.active{color:var(--primary);}
 
-/* ── Floating add button ── */
+/* FAB */
 .fab{
-  position:fixed;right:18px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:45;
+  position:fixed;right:18px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:45;
   width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;border:none;
   font-size:28px;line-height:1;box-shadow:0 6px 18px rgba(224,78,44,.4);display:none;align-items:center;justify-content:center;
 }
 .fab.show{display:flex;}
 
-/* ── Bottom sheet / modal ── */
+/* ── Bottom sheet ── */
 .scrim{position:fixed;inset:0;background:rgba(40,22,10,.45);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;}
 .scrim.open{opacity:1;pointer-events:auto;}
 .sheet{
   position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--bg);
-  border-radius:20px 20px 0 0;max-height:92vh;max-height:92dvh;overflow-y:auto;
+  border-radius:20px 20px 0 0;max-height:94vh;max-height:94dvh;overflow-y:auto;
   transform:translateY(100%);transition:transform .26s cubic-bezier(.32,.72,0,1);
-  padding-bottom:calc(20px + env(safe-area-inset-bottom));
-  box-shadow:0 -8px 30px rgba(0,0,0,.2);
+  padding-bottom:calc(24px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.2);
 }
 .sheet.open{transform:translateY(0);}
 .sheet-grip{width:38px;height:4px;background:var(--border);border-radius:3px;margin:9px auto 4px;}
@@ -127,34 +159,61 @@ main{padding:14px 14px 8px;max-width:680px;margin:0 auto;}
 .sheet-close{background:var(--surface-alt);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;color:var(--text-muted);flex:0 0 auto;}
 .sheet-body{padding:16px 18px 8px;}
 
-.label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:14px 0 6px;display:block;}
+.label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:15px 0 6px;display:block;}
 .label:first-child{margin-top:0;}
+.label .sub{text-transform:none;letter-spacing:0;font-weight:400;font-size:11px;}
 .field{
   width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;
   padding:11px 13px;font-size:16px;color:var(--text);
 }
 textarea.field{min-height:84px;resize:vertical;line-height:1.5;}
 select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%237A5F48' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;}
+.two{display:flex;gap:10px;}
+.two>div{flex:1;min-width:0;}
 
 .readbox{background:var(--surface-alt);border-radius:10px;padding:12px 13px;font-size:14.5px;line-height:1.5;color:var(--text);}
 .readmeta{font-size:12px;color:var(--text-muted);margin-top:8px;}
 
-/* deck toggle chips inside fact editor */
-.deck-toggles{display:flex;flex-wrap:wrap;gap:7px;}
-.deck-toggle{
-  background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:7px 13px;font-size:13.5px;font-weight:500;color:var(--text-muted);
-}
-.deck-toggle.on{background:#EAF6F3;border-color:var(--secondary);color:#1B7A6A;}
-.deck-toggle.on::before{content:"✓ ";font-weight:700;}
+/* rubric pills */
+.rubrics{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.r-pill{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:10px;}
+.r-pass{background:#E3F3EC;color:#1B7A6A;}
+.r-fail{background:#F1E7D8;color:#A38A6A;}
+.exp-note{background:#FEF8E6;border:1px solid #F0DFA8;border-radius:9px;padding:9px 11px;font-size:13px;color:#7A5A10;margin-top:12px;line-height:1.45;}
 
-.btn-primary{
-  width:100%;background:var(--primary);color:#fff;border:none;border-radius:12px;
-  padding:14px;font-size:16px;font-weight:600;margin-top:20px;
-}
+/* deck assignment (searchable) */
+.assigned-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px;}
+.a-chip{background:#EAF6F3;color:#1B7A6A;border-radius:14px;padding:6px 10px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;}
+.a-chip .x{font-size:15px;line-height:1;color:#1B7A6A;opacity:.7;}
+.pick-search{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;color:var(--text);margin-bottom:6px;}
+.pick-list{border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:230px;overflow-y:auto;background:var(--surface);}
+.pick-opt{padding:11px 13px;font-size:14.5px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.pick-opt:last-child{border-bottom:none;}
+.pick-opt.on{background:#EAF6F3;color:#1B7A6A;font-weight:600;}
+.pick-opt .tick{color:var(--secondary);font-weight:700;}
+.pick-empty{padding:12px;font-size:13px;color:var(--text-muted);text-align:center;}
+
+/* tag input */
+.tag-area{display:flex;flex-wrap:wrap;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px;}
+.tag-chip{background:#FBEFE4;color:#9A5A30;border-radius:13px;padding:5px 9px;font-size:13px;display:inline-flex;align-items:center;gap:6px;}
+.tag-chip .x{font-size:14px;opacity:.7;}
+.tag-input{border:none;outline:none;background:none;flex:1;min-width:90px;font-size:16px;color:var(--text);padding:4px;}
+.tag-suggest{margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;}
+.tag-suggest button{background:var(--surface-alt);border:1px dashed var(--border);border-radius:12px;padding:5px 10px;font-size:12.5px;color:var(--text-muted);}
+
+/* toggle chip list (linked decks for task/source) */
+.toggle-list{display:flex;flex-wrap:wrap;gap:7px;}
+.tg{background:var(--surface);border:1.5px solid var(--border);border-radius:15px;padding:7px 12px;font-size:13.5px;font-weight:500;color:var(--text-muted);}
+.tg.on{background:#EAF6F3;border-color:var(--secondary);color:#1B7A6A;}
+.tg.on::before{content:"✓ ";font-weight:700;}
+
+.btn-primary{width:100%;background:var(--primary);color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600;margin-top:22px;}
 .btn-primary:disabled{opacity:.55;}
-.btn-ghost{width:100%;background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:12px;padding:12px;font-size:14px;font-weight:500;margin-top:10px;}
+.btn-row{display:flex;gap:10px;margin-top:12px;}
+.btn-ghost{flex:1;background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:12px;padding:12px;font-size:14px;font-weight:500;}
+.btn-del{flex:1;background:none;border:1px solid var(--primary-lt);color:var(--primary);border-radius:12px;padding:12px;font-size:14px;font-weight:600;}
 
-/* ── Connect screen ── */
+/* connect */
 .connect{max-width:520px;margin:30px auto;padding:0 18px;text-align:center;}
 .connect .logo{font-size:46px;margin-bottom:8px;}
 .connect h2{font-size:24px;margin-bottom:8px;}
@@ -162,63 +221,101 @@ select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 .connect .field{text-align:left;margin-bottom:6px;}
 .connect .hint{font-size:12px;color:var(--text-muted);text-align:left;margin-bottom:18px;}
 
-/* ── Toast ── */
-.toast{
-  position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
   background:var(--text);color:var(--bg);padding:11px 18px;border-radius:24px;font-size:13.5px;font-weight:500;
-  z-index:90;opacity:0;pointer-events:none;transition:all .25s;max-width:88vw;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.25);
-}
+  z-index:90;opacity:0;pointer-events:none;transition:all .25s;max-width:88vw;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.25);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{background:var(--primary);color:#fff;}
-
-.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-alt) 50%,var(--surface) 75%);background-size:200% 100%;animation:sk 1.3s infinite;height:74px;border-radius:var(--radius);margin-bottom:10px;}
-@keyframes sk{to{background-position:-200% 0;}}
-.settings-link{font-size:12px;color:var(--text-muted);text-align:center;padding:14px;text-decoration:underline;}
+.settings-link{font-size:12px;color:var(--text-muted);text-align:center;padding:16px;text-decoration:underline;}
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div>
-    <h1>Cards of Alexandria</h1>
-    <div class="sub" id="topsub">Workshop</div>
-  </div>
+  <div><h1>Cards of Alexandria</h1><div class="sub" id="topsub">Workshop</div></div>
   <button class="sync-btn" id="syncBtn" onclick="pullAll()"><span class="spin">↻</span> Sync</button>
 </div>
 
-<!-- CONNECT SCREEN -->
+<!-- CONNECT -->
 <div id="connectScreen" class="connect" style="display:none;">
   <div class="logo">📇</div>
   <h2>Connect your sheet</h2>
   <p>Paste the same Apps Script Web App URL your desktop dashboard uses. This app reads and writes live to that one master Google Sheet.</p>
-  <input class="field" id="urlInput" type="url" inputmode="url" autocomplete="off"
-         placeholder="https://script.google.com/macros/s/…/exec">
-  <div class="hint">It must end in <b>/exec</b>. Find it in the desktop dashboard → Facts → Connect Google Sheets.</div>
+  <input class="field" id="urlInput" type="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
+  <div class="hint">It must end in <b>/exec</b>. Desktop dashboard → Facts → Connect Google Sheets.</div>
   <button class="btn-primary" style="margin-top:6px" onclick="connect()">Connect</button>
 </div>
 
 <!-- APP -->
 <div id="app" style="display:none;">
   <main>
-    <!-- FACTS -->
-    <section id="view-facts" class="view active">
-      <div class="view-head"><h2>Facts</h2><span class="count" id="facts-count"></span></div>
-      <input class="search" id="facts-search" placeholder="Search facts…" oninput="renderFacts()">
-      <div class="chips" id="facts-chips"></div>
-      <div id="facts-list"></div>
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="view-head"><h2>Overview</h2></div>
+      <div class="stats" id="stats"></div>
+      <div class="section-title">Focus Decks</div>
+      <div id="focus-list"></div>
+      <div class="section-title">Open Tasks</div>
+      <div id="dash-tasks"></div>
+    </section>
+
+    <!-- TASKS -->
+    <section id="view-tasks" class="view">
+      <div class="view-head"><h2>Tasks</h2><span class="count" id="tasks-count"></span></div>
+      <input class="search" id="tasks-search" placeholder="Search tasks…" oninput="renderTasks()">
+      <div class="filter-row">
+        <select class="mini-sel" id="tf-status" onchange="renderTasks()">
+          <option value="">All statuses</option><option value="not-started">Not started</option>
+          <option value="in-progress">In progress</option><option value="blocked">Blocked</option><option value="done">Done</option>
+        </select>
+        <select class="mini-sel" id="tf-cat" onchange="renderTasks()">
+          <option value="">All categories</option><option value="content">Content</option><option value="design">Design</option>
+          <option value="marketing">Marketing</option><option value="operations">Operations</option><option value="seo">SEO</option>
+          <option value="tech">Tech</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div id="tasks-list"></div>
     </section>
 
     <!-- DECKS -->
     <section id="view-decks" class="view">
       <div class="view-head"><h2>Decks</h2><span class="count" id="decks-count"></span></div>
       <input class="search" id="decks-search" placeholder="Search decks…" oninput="renderDecks()">
+      <div class="filter-row">
+        <select class="mini-sel" id="df-status" onchange="renderDecks()">
+          <option value="">All statuses</option><option value="focus">Focus</option><option value="planned">Planned</option><option value="complete">Complete</option>
+        </select>
+        <select class="mini-sel" id="df-tag" onchange="renderDecks()"><option value="">All tags</option></select>
+      </div>
       <div id="decks-list"></div>
+    </section>
+
+    <!-- FACTS -->
+    <section id="view-facts" class="view">
+      <div class="view-head"><h2>Facts</h2><span class="count" id="facts-count"></span></div>
+      <input class="search" id="facts-search" placeholder="Search facts…" oninput="renderFacts()">
+      <div class="filter-row">
+        <select class="mini-sel" id="ff-deck" onchange="renderFacts()"><option value="">All decks</option></select>
+        <select class="mini-sel" id="ff-qual" onchange="renderFacts()">
+          <option value="">Qualifies: all</option><option value="Yes">Qualifies: yes</option><option value="No">Qualifies: no</option>
+        </select>
+      </div>
+      <div class="chips" id="facts-chips"></div>
+      <div id="facts-list"></div>
     </section>
 
     <!-- SOURCES -->
     <section id="view-sources" class="view">
       <div class="view-head"><h2>Sources</h2><span class="count" id="sources-count"></span></div>
       <input class="search" id="sources-search" placeholder="Search sources…" oninput="renderSources()">
+      <div class="filter-row">
+        <select class="mini-sel" id="sf-type" onchange="renderSources()">
+          <option value="">All types</option><option value="book">Book</option><option value="podcast">Podcast</option>
+          <option value="paper">Paper</option><option value="article">Article</option><option value="website">Website</option>
+          <option value="documentary">Documentary</option><option value="other">Other</option>
+        </select>
+        <select class="mini-sel" id="sf-deck" onchange="renderSources()"><option value="">All decks</option></select>
+      </div>
       <div id="sources-list"></div>
     </section>
 
@@ -228,14 +325,14 @@ select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 
 <button class="fab" id="fab" onclick="onFab()">+</button>
 
-<!-- BOTTOM NAV -->
 <nav class="tabbar" id="tabbar" style="display:none;">
-  <button class="tab active" data-v="facts" onclick="nav('facts')"><span class="ico">📝</span>Facts</button>
+  <button class="tab active" data-v="dashboard" onclick="nav('dashboard')"><span class="ico">◈</span>Home</button>
+  <button class="tab" data-v="tasks" onclick="nav('tasks')"><span class="ico">✦</span>Tasks</button>
   <button class="tab" data-v="decks" onclick="nav('decks')"><span class="ico">🃏</span>Decks</button>
+  <button class="tab" data-v="facts" onclick="nav('facts')"><span class="ico">📝</span>Facts</button>
   <button class="tab" data-v="sources" onclick="nav('sources')"><span class="ico">📚</span>Sources</button>
 </nav>
 
-<!-- SHEET / MODAL -->
 <div class="scrim" id="scrim" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
   <div class="sheet-grip"></div>
@@ -247,23 +344,31 @@ select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   Cards of Alexandria — Mobile companion
+   Cards of Alexandria — Mobile companion (desktop-parity build)
    Talks to the SAME deployed Apps Script Web App as the desktop
-   dashboard. Pure GET requests (Apps Script 302-redirects POST→GET,
-   so every write goes through doGet just like the desktop app).
+   dashboard, using GET requests only (Apps Script 302-redirects
+   POST→GET, so every write goes through doGet — same as desktop).
    ════════════════════════════════════════════════════════════ */
-const URL_KEY='coa_m_url', FACTS_KEY='coa_m_facts', DECKS_KEY='coa_m_decks',
-      SRC_KEY='coa_m_sources', TIME_KEY='coa_m_time';
+const URL_KEY='coa_m_url',FACTS_KEY='coa_m_facts',DECKS_KEY='coa_m_decks',
+      SRC_KEY='coa_m_sources',TASKS_KEY='coa_m_tasks',TIME_KEY='coa_m_time';
 
-let sheetUrl = localStorage.getItem(URL_KEY) || '';
-let facts    = JSON.parse(localStorage.getItem(FACTS_KEY)||'[]');
-let decks    = JSON.parse(localStorage.getItem(DECKS_KEY)||'[]');
-let sources  = JSON.parse(localStorage.getItem(SRC_KEY)||'[]');
-let COL={}, activeStatus='', curView='facts';
+let sheetUrl=localStorage.getItem(URL_KEY)||'';
+let facts  =JSON.parse(localStorage.getItem(FACTS_KEY)||'[]');
+let decks  =JSON.parse(localStorage.getItem(DECKS_KEY)||'[]');
+let sources=JSON.parse(localStorage.getItem(SRC_KEY)||'[]');
+let tasks  =JSON.parse(localStorage.getItem(TASKS_KEY)||'[]');
+let COL={},activeStatus='',curView='dashboard';
 
-/* ── Flexible column mapping (mirrors desktop buildColMap) ── */
+/* ── Column shapes that the Apps Script expects (saveItem) ── */
+const COLS={
+  Decks:['id','title','subtitle','description','status','facts','expansionPages','tags','createdAt'],
+  Tasks:['id','title','description','dueDate','category','owner','status','deckIds','createdAt'],
+  Sources:['id','title','type','author','year','publisher','url','isbn','notes','deckIds','createdAt'],
+};
+
+/* ── Flexible Facts column map (mirrors desktop buildColMap) ── */
 function buildColMap(sample){
-  if(!sample) return;
+  if(!sample)return;
   const keys=Object.keys(sample);
   const norm=k=>k.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
   const normed=keys.map(norm);
@@ -272,20 +377,18 @@ function buildColMap(sample){
     factId:find('fact id')||find('fact','id')||keys[0],
     story:find('fact','story')||find('story')||find('fact','text')||find('candidate'),
     bookTitle:find('book','title')||find('book')||find('source','title'),
-    author:find('author'),
-    sourceType:find('source','type'),
-    genre:find('genre'),
-    tags:find('tags'),
-    targetDeck:find('target','deck'),
-    question:find('question'),
-    answer:find('answer'),
-    cardStatus:find('card','status'),
-    assignedDecks:find('assigned','decks')||find('assigned deck'),
+    author:find('author'),sourceType:find('source','type'),genre:find('genre'),
+    tags:find('tags'),targetDeck:find('target','deck'),location:find('location'),
+    c1:find('c1'),c2:find('c2'),c3:find('c3'),c4:find('c4'),c5:find('c5'),c6:find('c6'),
+    qualifies:find('qualifies'),qrExp:find('qr','expansion')||find('qr'),expNotes:find('expansion','notes'),
+    question:find('question'),answer:find('answer'),
+    cardStatus:find('card','status'),assignedDecks:find('assigned','decks')||find('assigned deck'),
   };
 }
 const get=(f,k)=>COL[k]?(f[COL[k]]??''):'';
+function qualOk(f){const v=String(get(f,'qualifies'));return v==='Yes'||v.includes('✓');}
+function qualNo(f){const v=String(get(f,'qualifies'));return v==='No'||v.toLowerCase().includes("doesn");}
 
-/* ── Card-status palette (mirrors desktop CS_META) ── */
 const CS_META=[
   {key:'',label:'Unset',color:'#7A5F48'},
   {key:'Draft',label:'Draft',color:'#8A6060'},
@@ -297,76 +400,57 @@ const CS_META=[
 ];
 const csColor=k=>(CS_META.find(m=>m.key===k)||CS_META[0]).color;
 
-/* ════════════ NETWORKING ════════════ */
+/* ════════════ NETWORK ════════════ */
 function base(){return sheetUrl.includes('?')?sheetUrl+'&':sheetUrl+'?';}
-
 async function apiRead(){
   const res=await fetch(sheetUrl+'?action=read&t='+Date.now(),{redirect:'follow'});
-  const data=await res.json();
-  if(data.error) throw new Error(data.error);
-  return data;
+  const d=await res.json(); if(d.error)throw new Error(d.error); return d;
 }
 async function apiUpdateFact(fields){
-  // The deployed Apps Script runs decodeURIComponent() on these four text
-  // fields, so they must be DOUBLE-encoded (encodeURIComponent here +
-  // URLSearchParams encoding again) — exactly what the desktop app sends.
-  // factId is passed raw (single-encoded by URLSearchParams). The live
-  // desktop uses action 'update'; we fall back to 'updateFact' (v3) if a
-  // deployment only recognises that name.
-  function buildParams(action){
-    const p=new URLSearchParams({action, factId:String(fields.factId)});
-    ['question','answer','cardStatus','assignedDecks'].forEach(k=>{
-      p.set(k, encodeURIComponent(fields[k]==null?'':String(fields[k])));
-    });
+  // 4 text fields are DOUBLE-encoded (script runs decodeURIComponent on them);
+  // factId stays raw. Live desktop uses action 'update'; fall back to 'updateFact'.
+  function build(action){
+    const p=new URLSearchParams({action,factId:String(fields.factId)});
+    ['question','answer','cardStatus','assignedDecks'].forEach(k=>p.set(k,encodeURIComponent(fields[k]==null?'':String(fields[k]))));
     return p;
   }
-  let res=await fetch(base()+buildParams('update').toString(),{redirect:'follow'});
+  let res=await fetch(base()+build('update').toString(),{redirect:'follow'});
   let r=await res.json();
-  if(r.error && /unknown action/i.test(r.error)){
-    res=await fetch(base()+buildParams('updateFact').toString(),{redirect:'follow'});
-    r=await res.json();
-  }
-  if(r.error) throw new Error(r.error);
-  return r;
+  if(r.error&&/unknown action/i.test(r.error)){res=await fetch(base()+build('updateFact').toString(),{redirect:'follow'});r=await res.json();}
+  if(r.error)throw new Error(r.error); return r;
 }
 async function apiSaveItem(sheet,item){
   const p=new URLSearchParams({action:'saveItem',sheet,item:JSON.stringify(item)});
   const res=await fetch(base()+p.toString(),{redirect:'follow'});
-  const r=await res.json(); if(r.error) throw new Error(r.error); return r;
+  const r=await res.json(); if(r.error)throw new Error(r.error); return r;
+}
+async function apiDeleteItem(sheet,id){
+  const p=new URLSearchParams({action:'deleteItem',sheet,id:String(id)});
+  const res=await fetch(base()+p.toString(),{redirect:'follow'});
+  const r=await res.json(); if(r.error)throw new Error(r.error); return r;
 }
 
 /* ════════════ SYNC ════════════ */
 let syncing=false;
 async function pullAll(){
-  if(!sheetUrl||syncing) return;
+  if(!sheetUrl||syncing)return;
   syncing=true;
-  const btn=document.getElementById('syncBtn');
-  btn.classList.add('syncing'); btn.disabled=true;
+  const btn=document.getElementById('syncBtn');btn.classList.add('syncing');btn.disabled=true;
   document.getElementById('topsub').textContent='Syncing…';
   try{
-    const data=await apiRead();
-    facts   = data.facts   || [];
-    decks   = data.decks   || [];
-    sources = data.sources || [];
-    if(facts.length) buildColMap(facts[0]);
-    localStorage.setItem(FACTS_KEY,JSON.stringify(facts));
-    localStorage.setItem(DECKS_KEY,JSON.stringify(decks));
-    localStorage.setItem(SRC_KEY,JSON.stringify(sources));
+    const d=await apiRead();
+    facts=d.facts||[]; decks=d.decks||[]; sources=d.sources||[]; tasks=d.tasks||[];
+    if(facts.length)buildColMap(facts[0]);
+    save(FACTS_KEY,facts);save(DECKS_KEY,decks);save(SRC_KEY,sources);save(TASKS_KEY,tasks);
     localStorage.setItem(TIME_KEY,new Date().toISOString());
-    renderAll(); updateTopSub();
+    refreshFilters();renderAll();updateTopSub();
     toast(`Synced · ${facts.length} facts · ${decks.length} decks`);
-  }catch(e){
-    toast('Sync failed: '+e.message,true);
-    updateTopSub();
-  }finally{
-    syncing=false; btn.classList.remove('syncing'); btn.disabled=false;
-  }
+  }catch(e){toast('Sync failed: '+e.message,true);updateTopSub();}
+  finally{syncing=false;btn.classList.remove('syncing');btn.disabled=false;}
 }
 function updateTopSub(){
   const t=localStorage.getItem(TIME_KEY);
-  document.getElementById('topsub').textContent = t
-    ? 'Synced '+new Date(t).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})
-    : 'Workshop';
+  document.getElementById('topsub').textContent=t?'Synced '+new Date(t).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'Workshop';
 }
 
 /* ════════════ NAV ════════════ */
@@ -374,286 +458,444 @@ function nav(v){
   curView=v;
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
-  const fab=document.getElementById('fab');
-  fab.classList.toggle('show', v==='decks'||v==='sources');
+  document.getElementById('fab').classList.toggle('show',v==='decks'||v==='sources'||v==='tasks');
   window.scrollTo(0,0);
 }
-function onFab(){ curView==='decks'?openDeckForm():openSourceForm(); }
+function onFab(){curView==='decks'?openDeck():curView==='sources'?openSource():curView==='tasks'?openTask():null;}
 
-/* ════════════ RENDER: FACTS ════════════ */
-function renderFactChips(){
-  const counts={}; CS_META.forEach(m=>counts[m.key]=0);
-  facts.forEach(f=>{const cs=get(f,'cardStatus')||'';counts[cs]!==undefined?counts[cs]++:counts['']++;});
-  const total=facts.length;
-  let html=`<button class="chip${activeStatus===''?' active':''}" onclick="setStatus('')">All<span class="n">${total}</span></button>`;
-  html+=CS_META.filter(m=>m.key!=='').map(m=>
-    `<button class="chip${activeStatus===m.key?' active':''}" onclick="setStatus('${m.key.replace(/'/g,"\\'")}')">${m.label}<span class="n">${counts[m.key]||0}</span></button>`
-  ).join('');
-  document.getElementById('facts-chips').innerHTML=html;
-}
-function setStatus(k){activeStatus=k;renderFactChips();renderFacts();}
-
-function renderFacts(){
-  const q=(document.getElementById('facts-search').value||'').toLowerCase();
-  let list=facts.slice();
-  if(activeStatus!=='') list=list.filter(f=>(get(f,'cardStatus')||'')===activeStatus);
-  if(q) list=list.filter(f=>(
-    get(f,'story')+' '+get(f,'question')+' '+get(f,'answer')+' '+get(f,'bookTitle')+' '+get(f,'assignedDecks')
-  ).toLowerCase().includes(q));
-  document.getElementById('facts-count').textContent=list.length+' shown';
-  const el=document.getElementById('facts-list');
-  if(!list.length){el.innerHTML=emptyState('📝','No facts match','Sync, or adjust your search and filters.');return;}
-  el.innerHTML=list.map(f=>{
-    const id=get(f,'factId');
-    const title=get(f,'question')||get(f,'story')||'(untitled fact)';
-    const cs=get(f,'cardStatus')||'';
-    const ad=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
-    const decksBadges=ad.length?ad.map(d=>`<span class="badge badge-deck">${esc(d)}</span>`).join(''):'';
-    return `<div class="item" onclick="openFact('${esc(id)}')">
-      <div class="item-title">${esc(clip(title,140))}</div>
-      <div class="item-meta">
-        <span class="dot" style="background:${csColor(cs)}"></span>
-        <span>${esc(cs||'Unset')}</span>
-        ${get(f,'bookTitle')?`<span>· ${esc(clip(get(f,'bookTitle'),34))}</span>`:''}
-      </div>
-      ${decksBadges?`<div class="item-meta" style="margin-top:7px">${decksBadges}</div>`:''}
+/* ════════════ DASHBOARD ════════════ */
+function renderDashboard(){
+  const done=tasks.filter(t=>t.status==='done').length, open=tasks.length-done;
+  const focus=decks.filter(d=>d.status==='focus');
+  document.getElementById('stats').innerHTML=`
+    <div class="stat"><div class="lbl">Open Tasks</div><div class="val">${open}</div><div class="note">${done} completed</div></div>
+    <div class="stat green"><div class="lbl">Completed</div><div class="val">${done}</div><div class="note">${tasks.length} total</div></div>
+    <div class="stat amber"><div class="lbl">Total Decks</div><div class="val">${decks.length}</div><div class="note">${decks.filter(d=>d.status==='complete').length} complete</div></div>
+    <div class="stat teal"><div class="lbl">Focus Decks</div><div class="val">${focus.length}</div><div class="note">Currently active</div></div>`;
+  const fl=document.getElementById('focus-list');
+  fl.innerHTML=focus.length?focus.map(d=>{
+    const fp=Math.min(100,Math.round((num(d.facts)/50)*100));
+    const dots=[0,1,2,3].map(i=>`<div class="exp-dot ${i<num(d.expansionPages)?'on':''}">✓</div>`).join('');
+    return `<div class="item" onclick="openDeck('${d.id}')">
+      <div class="item-title">${esc(d.title)}</div>
+      ${d.subtitle?`<div class="item-sub">${esc(d.subtitle)}</div>`:''}
+      <div style="font-size:12px;color:var(--text-muted);margin-top:10px;display:flex;justify-content:space-between"><span>Facts</span><span>${num(d.facts)} / 50</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${fp}%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:10px;display:flex;justify-content:space-between"><span>Expansion pages</span><span>${num(d.expansionPages)} of 3–4</span></div>
+      <div class="exp-dots">${dots}</div>
     </div>`;
-  }).join('');
+  }).join(''):emptyState('📚','No focus decks','Mark a deck as Focus to track it here.');
+  const recent=tasks.filter(t=>t.status!=='done').sort((a,b)=>((a.dueDate||'z')>(b.dueDate||'z')?1:-1)).slice(0,5);
+  document.getElementById('dash-tasks').innerHTML=recent.length?recent.map(taskItem).join(''):`<div style="color:var(--text-muted);font-size:13px;padding:10px 2px">No open tasks — all clear 🎉</div>`;
 }
 
-/* ── Fact editor sheet: assign decks + rewrite Q/A + status ── */
-let editFactId=null, editAssigned=[];
-function openFact(id){
-  const f=facts.find(x=>String(get(x,'factId'))===String(id));
-  if(!f){toast('Fact not found — try syncing',true);return;}
-  editFactId=id;
-  editAssigned=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
-  const story=get(f,'story'); const cs=get(f,'cardStatus')||'';
-  const deckNames=[...new Set(decks.map(d=>d.title).filter(Boolean))];
-  // include any assigned decks not in the decks list (e.g. target deck typed manually)
-  editAssigned.forEach(a=>{if(!deckNames.includes(a))deckNames.push(a);});
-
-  document.getElementById('sheet-title').textContent='Edit fact';
-  document.getElementById('sheet-body').innerHTML=`
-    ${story?`<span class="label">Original fact</span><div class="readbox">${esc(story)}</div>
-      <div class="readmeta">${esc(get(f,'bookTitle')||'')}${get(f,'author')?' — '+esc(get(f,'author')):''}</div>`:''}
-
-    <span class="label">Assign to decks</span>
-    <div class="deck-toggles" id="deckToggles">
-      ${deckNames.length?deckNames.map(n=>
-        `<button type="button" class="deck-toggle${editAssigned.includes(n)?' on':''}" onclick="toggleDeck(this,'${esc(n).replace(/'/g,"\\'")}')">${esc(n)}</button>`
-      ).join(''):'<span style="font-size:13px;color:var(--text-muted)">No decks yet — add one in the Decks tab.</span>'}
+/* ════════════ TASKS ════════════ */
+const ST_LABEL={'not-started':'Not started','in-progress':'In progress','blocked':'Blocked','done':'Done'};
+const ST_CLASS={'not-started':'b-ns','in-progress':'b-ip','blocked':'b-blk','done':'b-done'};
+const ST_COLOR={'not-started':'#7A5F48','in-progress':'#E8A82C','blocked':'#E04E2C','done':'#38A08C'};
+function taskItem(t){
+  const linked=decks.filter(d=>(t.deckIds||[]).includes(d.id));
+  return `<div class="item" onclick="openTask('${t.id}')">
+    <div style="display:flex;gap:9px;align-items:flex-start">
+      <span class="dot" style="margin-top:5px;background:${ST_COLOR[t.status]||'#7A5F48'}"></span>
+      <div style="flex:1;min-width:0">
+        <div class="item-title">${esc(t.title)}</div>
+        <div class="item-meta" style="margin-top:6px">
+          <span class="badge ${ST_CLASS[t.status]||'b-ns'}">${ST_LABEL[t.status]||t.status}</span>
+          ${t.category?`<span class="badge b-cat">${esc(t.category)}</span>`:''}
+          ${t.owner?`<span>👤 ${esc(t.owner)}</span>`:''}
+          ${t.dueDate?`<span>📅 ${esc(t.dueDate)}</span>`:''}
+          ${linked.map(d=>`<span class="badge b-deck">${esc(d.title)}</span>`).join('')}
+        </div>
+      </div>
+    </div></div>`;
+}
+function renderTasks(){
+  const q=val('tasks-search').toLowerCase(),st=val('tf-status'),cat=val('tf-cat');
+  let list=tasks.filter(t=>{
+    if(q&&!((t.title||'')+' '+(t.description||'')).toLowerCase().includes(q))return false;
+    if(st&&t.status!==st)return false; if(cat&&t.category!==cat)return false; return true;
+  });
+  list.sort((a,b)=>{if(a.status==='done'&&b.status!=='done')return 1;if(a.status!=='done'&&b.status==='done')return -1;return (a.dueDate||'z')>(b.dueDate||'z')?1:-1;});
+  document.getElementById('tasks-count').textContent=list.length+' shown';
+  document.getElementById('tasks-list').innerHTML=list.length?list.map(taskItem).join(''):emptyState('✦','No tasks','Tap + to add one.');
+}
+function openTask(id){
+  const t=id?tasks.find(x=>x.id===id):null;
+  linkSel=t?[...(t.deckIds||[])]:[];
+  sheetTitle(t?'Edit task':'New task');
+  body(`
+    <span class="label">Title *</span><input class="field" id="t-title" value="${attr(t?.title)}" placeholder="What needs doing?">
+    <span class="label">Description</span><textarea class="field" id="t-desc" placeholder="Detail, context…">${esc(t?.description||'')}</textarea>
+    <div class="two">
+      <div><span class="label">Due date</span><input class="field" id="t-due" type="date" value="${attr(t?.dueDate)}"></div>
+      <div><span class="label">Category</span><select class="field" id="t-cat">${opts(['','content','design','marketing','operations','seo','tech','other'],t?.category)}</select></div>
     </div>
-
-    <span class="label">Card question (front)</span>
-    <textarea class="field" id="f-question" placeholder="The hook / question printed on the front…">${esc(get(f,'question'))}</textarea>
-
-    <span class="label">Card answer (back)</span>
-    <textarea class="field" id="f-answer" placeholder="The fact / answer with context…">${esc(get(f,'answer'))}</textarea>
-
-    <span class="label">Card status</span>
-    <select class="field" id="f-status">
-      ${CS_META.map(m=>`<option value="${esc(m.key)}"${cs===m.key?' selected':''}>${m.key||'Unset'}</option>`).join('')}
-    </select>
-
-    <button class="btn-primary" id="saveFactBtn" onclick="saveFact()">Save to sheet</button>
-  `;
+    <div class="two">
+      <div><span class="label">Owner</span><input class="field" id="t-owner" value="${attr(t?.owner)}" placeholder="Who owns this?"></div>
+      <div><span class="label">Status</span><select class="field" id="t-status">${opts(['not-started','in-progress','blocked','done'],t?.status||'not-started',ST_LABEL)}</select></div>
+    </div>
+    <span class="label">Linked decks</span><div class="toggle-list" id="t-decks">${deckToggles(linkSel)}</div>
+    <button class="btn-primary" id="saveBtn" onclick="saveTask('${id||''}')">${t?'Save task':'Add task'}</button>
+    ${t?`<div class="btn-row"><button class="btn-del" onclick="delItem('Tasks','${id}')">Delete task</button></div>`:''}
+  `);
+  bindDeckToggles('t-decks');
   openSheet();
 }
-function toggleDeck(btn,name){
-  const i=editAssigned.indexOf(name);
-  if(i>=0){editAssigned.splice(i,1);btn.classList.remove('on');}
-  else{editAssigned.push(name);btn.classList.add('on');}
-}
-async function saveFact(){
-  const btn=document.getElementById('saveFactBtn');
-  btn.disabled=true;btn.textContent='Saving…';
-  const fields={
-    factId:editFactId,
-    question:document.getElementById('f-question').value,
-    answer:document.getElementById('f-answer').value,
-    cardStatus:document.getElementById('f-status').value,
-    assignedDecks:editAssigned.join('|'),
-  };
-  try{
-    await apiUpdateFact(fields);
-    // reflect locally
-    const f=facts.find(x=>String(get(x,'factId'))===String(editFactId));
-    if(f){
-      if(COL.question)f[COL.question]=fields.question;
-      if(COL.answer)f[COL.answer]=fields.answer;
-      if(COL.cardStatus)f[COL.cardStatus]=fields.cardStatus;
-      if(COL.assignedDecks)f[COL.assignedDecks]=fields.assignedDecks;
-    }
-    localStorage.setItem(FACTS_KEY,JSON.stringify(facts));
-    renderFactChips();renderFacts();
-    closeSheet();toast('Saved ✓');
-  }catch(e){
-    toast('Save failed: '+e.message,true);
-    btn.disabled=false;btn.textContent='Save to sheet';
-  }
+async function saveTask(id){
+  const title=val('t-title').trim(); if(!title)return toast('Title is required',true);
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  const existing=id?tasks.find(t=>t.id===id):null;
+  const item={id:id||uid('t'),title,description:val('t-desc').trim(),dueDate:val('t-due'),
+    category:val('t-cat'),owner:val('t-owner').trim(),status:val('t-status'),
+    deckIds:[...linkSel],createdAt:existing?existing.createdAt:today()};
+  try{await apiSaveItem('Tasks',item);
+    if(existing)Object.assign(existing,item);else tasks.push(item);
+    save(TASKS_KEY,tasks);renderTasks();renderDashboard();closeSheet();toast(id?'Task updated ✓':'Task added ✓');
+  }catch(e){toast('Save failed: '+e.message,true);btn.disabled=false;btn.textContent='Add task';}
 }
 
-/* ════════════ RENDER: DECKS ════════════ */
+/* ════════════ DECKS ════════════ */
 function renderDecks(){
-  const q=(document.getElementById('decks-search').value||'').toLowerCase();
-  let list=decks.slice();
-  if(q) list=list.filter(d=>((d.title||'')+' '+(d.subtitle||'')+' '+(Array.isArray(d.tags)?d.tags.join(' '):d.tags||'')).toLowerCase().includes(q));
+  const q=val('decks-search').toLowerCase(),st=val('df-status'),tag=val('df-tag');
+  let list=decks.filter(d=>{
+    if(q&&!((d.title||'')+' '+(d.subtitle||'')+' '+(d.description||'')).toLowerCase().includes(q))return false;
+    if(st&&d.status!==st)return false;
+    if(tag&&!(arr(d.tags)).includes(tag))return false; return true;
+  });
   document.getElementById('decks-count').textContent=decks.length+' total';
-  const el=document.getElementById('decks-list');
-  if(!list.length){el.innerHTML=emptyState('🃏','No decks yet','Tap + to capture a deck idea.');return;}
-  // count assigned facts per deck title
-  const fc={};
-  facts.forEach(f=>String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean).forEach(n=>fc[n]=(fc[n]||0)+1));
-  el.innerHTML=list.map(d=>{
-    const tags=Array.isArray(d.tags)?d.tags:(d.tags?String(d.tags).split('|'):[]);
+  const fc={};facts.forEach(f=>String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean).forEach(n=>fc[n]=(fc[n]||0)+1));
+  document.getElementById('decks-list').innerHTML=list.length?list.map(d=>{
+    const sBadge={focus:'b-focus',planned:'b-planned',complete:'b-complete'}[d.status]||'b-planned';
     const assigned=fc[d.title]||0;
-    return `<div class="item">
-      <div class="item-title">${esc(d.title||'(untitled)')}</div>
+    const fp=Math.min(100,Math.round((num(d.facts)/50)*100));
+    return `<div class="item" onclick="openDeck('${d.id}')">
+      <div class="item-title">${esc(d.title)}</div>
       ${d.subtitle?`<div class="item-sub">${esc(d.subtitle)}</div>`:''}
       <div class="item-meta" style="margin-top:8px">
-        <span class="badge badge-status">${esc(d.status||'planned')}</span>
-        <span class="badge badge-deck">${assigned} fact${assigned===1?'':'s'}</span>
-        ${tags.filter(Boolean).slice(0,3).map(t=>`<span class="badge badge-tag">${esc(t)}</span>`).join('')}
+        <span class="badge ${sBadge}">${cap(d.status||'planned')}</span>
+        <span class="badge b-deck">${assigned} assigned</span>
+        ${arr(d.tags).slice(0,4).map(t=>`<span class="badge b-tag">${esc(t)}</span>`).join('')}
       </div>
+      <div style="font-size:11.5px;color:var(--text-muted);margin-top:9px;display:flex;justify-content:space-between"><span>${num(d.facts)} / 50 facts</span><span>${num(d.expansionPages)} / 3–4 pages</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${fp}%"></div></div>
     </div>`;
-  }).join('');
+  }).join(''):emptyState('🃏','No decks','Tap + to add a deck.');
 }
-function openDeckForm(){
-  document.getElementById('sheet-title').textContent='New deck idea';
-  document.getElementById('sheet-body').innerHTML=`
-    <span class="label">Title *</span>
-    <input class="field" id="d-title" placeholder="e.g. History of Salt">
-    <span class="label">Subtitle</span>
-    <input class="field" id="d-subtitle" placeholder="One-line hook">
-    <span class="label">Tags (comma-separated)</span>
-    <input class="field" id="d-tags" placeholder="food-history, science">
-    <span class="label">Status</span>
-    <select class="field" id="d-status">
-      <option value="planned" selected>planned</option>
-      <option value="focus">focus</option>
-      <option value="complete">complete</option>
-    </select>
-    <button class="btn-primary" id="saveDeckBtn" onclick="saveDeck()">Add deck</button>
-  `;
+let editTags=[];
+function openDeck(id){
+  const d=id?decks.find(x=>x.id===id):null;
+  editTags=d?[...arr(d.tags)]:[];
+  sheetTitle(d?'Edit deck':'New deck idea');
+  body(`
+    <span class="label">Title *</span><input class="field" id="d-title" value="${attr(d?.title)}" placeholder="e.g. History of Salt">
+    <span class="label">Subtitle</span><input class="field" id="d-subtitle" value="${attr(d?.subtitle)}" placeholder="One-line hook">
+    <span class="label">Description</span><textarea class="field" id="d-desc" placeholder="What's it about? Who's the audience?">${esc(d?.description||'')}</textarea>
+    <div class="two">
+      <div><span class="label">Status</span><select class="field" id="d-status">${opts(['focus','planned','complete'],d?.status||'planned',{focus:'Focus',planned:'Planned (future)',complete:'Complete'})}</select></div>
+      <div><span class="label">Facts collected</span><input class="field" id="d-facts" type="number" inputmode="numeric" min="0" value="${num(d?.facts)}"></div>
+    </div>
+    <span class="label">Expansion pages <span class="sub">(target 3–4)</span></span><input class="field" id="d-exp" type="number" inputmode="numeric" min="0" value="${num(d?.expansionPages)}">
+    <span class="label">Tags</span>
+    <div class="tag-area" id="tag-area" onclick="document.getElementById('tag-input').focus()">
+      <input class="tag-input" id="tag-input" placeholder="Type a tag, press Enter…" autocomplete="off">
+    </div>
+    <div class="tag-suggest" id="tag-suggest"></div>
+    <button class="btn-primary" id="saveBtn" onclick="saveDeck('${id||''}')">${d?'Save deck':'Add deck'}</button>
+    ${d?`<div class="btn-row"><button class="btn-del" onclick="delItem('Decks','${id}')">Delete deck</button></div>`:''}
+  `);
+  renderTags();bindTagInput();
   openSheet();
 }
-async function saveDeck(){
-  const title=document.getElementById('d-title').value.trim();
-  if(!title){toast('Title is required',true);return;}
-  const btn=document.getElementById('saveDeckBtn');btn.disabled=true;btn.textContent='Saving…';
-  const item={
-    id:'d'+Date.now(), title,
-    subtitle:document.getElementById('d-subtitle').value.trim(),
-    description:'',
-    status:document.getElementById('d-status').value,
-    facts:0, expansionPages:0,
-    tags:document.getElementById('d-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
-    createdAt:todayStr(),
-  };
-  try{
-    await apiSaveItem('Decks',item);
-    decks.push(item);
-    localStorage.setItem(DECKS_KEY,JSON.stringify(decks));
-    renderDecks();closeSheet();toast('Deck added ✓');
+function renderTags(){
+  const area=document.getElementById('tag-area'),input=document.getElementById('tag-input');
+  area.querySelectorAll('.tag-chip').forEach(c=>c.remove());
+  editTags.forEach(t=>{
+    const chip=document.createElement('div');chip.className='tag-chip';
+    chip.innerHTML=`${esc(t)}<span class="x">×</span>`;
+    chip.querySelector('.x').addEventListener('click',e=>{e.stopPropagation();editTags=editTags.filter(x=>x!==t);renderTags();});
+    area.insertBefore(chip,input);
+  });
+}
+function addTag(v){v=v.trim().toLowerCase().replace(/\s+/g,'-');if(!v||editTags.includes(v))return;editTags.push(v);renderTags();document.getElementById('tag-input').value='';showSuggest('');}
+function showSuggest(v){
+  const box=document.getElementById('tag-suggest');
+  if(!v){box.innerHTML='';return;}
+  const m=allTags().filter(t=>t.includes(v)&&!editTags.includes(t)).slice(0,8);
+  box.innerHTML=m.map(t=>`<button type="button" data-t="${attr(t)}">+ ${esc(t)}</button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>addTag(b.dataset.t)));
+}
+function bindTagInput(){
+  const input=document.getElementById('tag-input');
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(input.value);}
+    if(e.key==='Backspace'&&!input.value&&editTags.length){editTags.pop();renderTags();}
+  });
+  input.addEventListener('input',e=>showSuggest(e.target.value.toLowerCase()));
+}
+async function saveDeck(id){
+  const title=val('d-title').trim(); if(!title)return toast('Title is required',true);
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  const existing=id?decks.find(d=>d.id===id):null;
+  const item={id:id||uid('d'),title,subtitle:val('d-subtitle').trim(),description:val('d-desc').trim(),
+    status:val('d-status'),facts:parseInt(val('d-facts'))||0,expansionPages:parseInt(val('d-exp'))||0,
+    tags:[...editTags],createdAt:existing?existing.createdAt:today()};
+  try{await apiSaveItem('Decks',item);
+    if(existing)Object.assign(existing,item);else decks.push(item);
+    save(DECKS_KEY,decks);refreshFilters();renderDecks();renderDashboard();closeSheet();toast(id?'Deck updated ✓':'Deck added ✓');
   }catch(e){toast('Save failed: '+e.message,true);btn.disabled=false;btn.textContent='Add deck';}
 }
 
-/* ════════════ RENDER: SOURCES ════════════ */
-function renderSources(){
-  const q=(document.getElementById('sources-search').value||'').toLowerCase();
-  let list=sources.slice();
-  if(q) list=list.filter(s=>((s.title||'')+' '+(s.author||'')+' '+(s.type||'')+' '+(s.notes||'')).toLowerCase().includes(q));
-  document.getElementById('sources-count').textContent=sources.length+' total';
-  const el=document.getElementById('sources-list');
-  if(!list.length){el.innerHTML=emptyState('📚','No sources yet','Tap + to capture something you found.');return;}
-  el.innerHTML=list.map(s=>`<div class="item">
-    <div class="item-title">${esc(s.title||'(untitled)')}</div>
-    <div class="item-meta" style="margin-top:5px">
-      <span class="badge badge-status">${esc(s.type||'other')}</span>
-      ${s.author?`<span>${esc(s.author)}</span>`:''}${s.year?`<span>· ${esc(s.year)}</span>`:''}
-    </div>
-    ${s.notes?`<div class="item-sub">${esc(clip(s.notes,160))}</div>`:''}
-    ${s.url?`<div class="item-meta" style="margin-top:6px"><a href="${esc(s.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--primary)">Open link ↗</a></div>`:''}
-  </div>`).join('');
+/* ════════════ FACTS ════════════ */
+function renderFactChips(){
+  const counts={};CS_META.forEach(m=>counts[m.key]=0);
+  facts.forEach(f=>{const cs=get(f,'cardStatus')||'';counts[cs]!==undefined?counts[cs]++:counts['']++;});
+  let html=`<button class="chip${activeStatus===''?' active':''}" onclick="setStatus('')">All<span class="n">${facts.length}</span></button>`;
+  html+=CS_META.filter(m=>m.key!=='').map(m=>`<button class="chip${activeStatus===m.key?' active':''}" onclick="setStatus('${m.key.replace(/'/g,"\\'")}')">${m.label}<span class="n">${counts[m.key]||0}</span></button>`).join('');
+  document.getElementById('facts-chips').innerHTML=html;
 }
-function openSourceForm(){
-  document.getElementById('sheet-title').textContent='New source';
-  document.getElementById('sheet-body').innerHTML=`
-    <span class="label">Title *</span>
-    <input class="field" id="s-title" placeholder="Book / article / podcast title">
-    <span class="label">Type</span>
-    <select class="field" id="s-type">
-      ${['book','podcast','paper','article','website','documentary','other'].map(t=>`<option value="${t}">${t}</option>`).join('')}
-    </select>
-    <span class="label">Author</span>
-    <input class="field" id="s-author" placeholder="Author / creator">
-    <span class="label">Year</span>
-    <input class="field" id="s-year" inputmode="numeric" placeholder="2021">
-    <span class="label">URL</span>
-    <input class="field" id="s-url" type="url" inputmode="url" placeholder="https://…">
-    <span class="label">Notes</span>
-    <textarea class="field" id="s-notes" placeholder="Why it's useful, what to mine from it…"></textarea>
-    <button class="btn-primary" id="saveSrcBtn" onclick="saveSource()">Add source</button>
-  `;
+function setStatus(k){activeStatus=k;renderFactChips();renderFacts();}
+function renderFacts(){
+  const q=val('facts-search').toLowerCase(),deck=val('ff-deck'),qual=val('ff-qual');
+  let list=facts.filter(f=>{
+    if(activeStatus!==''&&(get(f,'cardStatus')||'')!==activeStatus)return false;
+    if(deck){const t=get(f,'targetDeck')===deck;const a=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).includes(deck);if(!t&&!a)return false;}
+    if(qual==='Yes'&&!qualOk(f))return false; if(qual==='No'&&!qualNo(f))return false;
+    if(q&&!([get(f,'story'),get(f,'factId'),get(f,'question'),get(f,'answer'),get(f,'bookTitle')].join(' ').toLowerCase().includes(q)))return false;
+    return true;
+  });
+  document.getElementById('facts-count').textContent=list.length+' of '+facts.length;
+  const el=document.getElementById('facts-list');
+  if(!facts.length){el.innerHTML=emptyState('📝','No facts yet','Tap Sync to pull from your sheet.');return;}
+  if(!list.length){el.innerHTML=emptyState('🔍','No matches','Adjust search or filters.');return;}
+  el.innerHTML=list.map(f=>{
+    const id=get(f,'factId');
+    const title=get(f,'question')||get(f,'story')||'(untitled)';
+    const cs=get(f,'cardStatus')||'';
+    const ad=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
+    return `<div class="item" onclick="openFact('${attr(id)}')">
+      <div class="item-title">${esc(clip(title,140))}</div>
+      <div class="item-meta">
+        <span class="dot" style="background:${csColor(cs)}"></span><span>${esc(cs||'Unset')}</span>
+        ${qualOk(f)?'<span class="badge b-done">Qualifies ✓</span>':''}
+        ${get(f,'bookTitle')?`<span>· ${esc(clip(get(f,'bookTitle'),30))}</span>`:''}
+      </div>
+      ${ad.length?`<div class="item-meta" style="margin-top:7px">${ad.map(d=>`<span class="badge b-deck">${esc(d)}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* fact editor — with searchable deck assignment (desktop parity) */
+let editFactId=null,editAssigned=[];
+function openFact(id){
+  const f=facts.find(x=>String(get(x,'factId'))===String(id));
+  if(!f)return toast('Fact not found — try syncing',true);
+  editFactId=id;
+  editAssigned=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
+  const story=get(f,'story'),cs=get(f,'cardStatus')||'',exp=get(f,'expNotes');
+  const rubricDefs=[['c1','C1 Surprise'],['c2','C2 Reframe'],['c3','C3 Awe'],['c4','C4 Narrative'],['c5','C5 Format'],['c6','C6 Audience']];
+  const rubrics=rubricDefs.map(([k,l])=>{const v=String(get(f,k));const pass=(v==='Yes'||v==='TRUE'||v==='true');return `<span class="r-pill ${pass?'r-pass':'r-fail'}">${pass?'✓':'✗'} ${l}</span>`;}).join('');
+  sheetTitle('Edit fact');
+  body(`
+    ${story?`<span class="label">Original fact</span><div class="readbox">${esc(story)}</div>
+      <div class="readmeta">${esc(get(f,'bookTitle')||'')}${get(f,'author')?' — '+esc(get(f,'author')):''}${get(f,'targetDeck')?' · target: '+esc(get(f,'targetDeck')):''}</div>`:''}
+    ${rubrics?`<div class="rubrics">${rubrics}</div>`:''}
+    ${exp?`<div class="exp-note"><b>Expansion idea:</b> ${esc(exp)}</div>`:''}
+
+    <span class="label">Assigned decks</span>
+    <div class="assigned-chips" id="fa-chips"></div>
+    <input class="pick-search" id="fa-search" placeholder="Search decks to assign…" autocomplete="off">
+    <div class="pick-list" id="fa-list"></div>
+
+    <span class="label">Card question <span class="sub">(front)</span></span>
+    <textarea class="field" id="f-q" placeholder="The hook / question…">${esc(get(f,'question'))}</textarea>
+    <span class="label">Card answer <span class="sub">(back — fact, context, payoff)</span></span>
+    <textarea class="field" id="f-a" placeholder="The answer with context…">${esc(get(f,'answer'))}</textarea>
+    <span class="label">Card status</span>
+    <select class="field" id="f-cs">${CS_META.map(m=>`<option value="${attr(m.key)}"${cs===m.key?' selected':''}>${m.key||'Unset'}</option>`).join('')}</select>
+
+    <button class="btn-primary" id="saveBtn" onclick="saveFact()">Save to sheet</button>
+  `);
+  renderAssignChips();renderPickList('');
+  document.getElementById('fa-search').addEventListener('input',e=>renderPickList(e.target.value.toLowerCase()));
   openSheet();
 }
-async function saveSource(){
-  const title=document.getElementById('s-title').value.trim();
-  if(!title){toast('Title is required',true);return;}
-  const btn=document.getElementById('saveSrcBtn');btn.disabled=true;btn.textContent='Saving…';
-  const item={
-    id:'src'+Date.now(), title,
-    type:document.getElementById('s-type').value,
-    author:document.getElementById('s-author').value.trim(),
-    year:document.getElementById('s-year').value.trim(),
-    publisher:'',
-    url:document.getElementById('s-url').value.trim(),
-    isbn:'',
-    notes:document.getElementById('s-notes').value.trim(),
-    deckIds:[],
-    createdAt:todayStr(),
-  };
-  try{
-    await apiSaveItem('Sources',item);
-    sources.push(item);
-    localStorage.setItem(SRC_KEY,JSON.stringify(sources));
-    renderSources();closeSheet();toast('Source added ✓');
+function deckNamePool(){
+  const names=[...new Set(decks.map(d=>d.title).filter(Boolean))];
+  editAssigned.forEach(a=>{if(!names.includes(a))names.push(a);}); // keep manually-typed assignments
+  return names.sort((a,b)=>a.localeCompare(b));
+}
+function renderAssignChips(){
+  document.getElementById('fa-chips').innerHTML=editAssigned.length
+    ? editAssigned.map((n,i)=>`<span class="a-chip">${esc(n)}<span class="x" data-i="${i}">×</span></span>`).join('')
+    : `<span style="font-size:13px;color:var(--text-muted)">None yet — pick from the list below.</span>`;
+  document.querySelectorAll('#fa-chips .x').forEach(x=>x.addEventListener('click',()=>{editAssigned.splice(+x.dataset.i,1);renderAssignChips();renderPickList(document.getElementById('fa-search').value.toLowerCase());}));
+}
+function renderPickList(q){
+  const names=deckNamePool().filter(n=>n.toLowerCase().includes(q));
+  const el=document.getElementById('fa-list');
+  if(!names.length){el.innerHTML=`<div class="pick-empty">No decks match — add decks in the Decks tab.</div>`;return;}
+  el.innerHTML=names.map((n,i)=>{const on=editAssigned.includes(n);return `<div class="pick-opt${on?' on':''}" data-name="${attr(n)}">${esc(n)}${on?'<span class="tick">✓</span>':''}</div>`;}).join('');
+  el.querySelectorAll('.pick-opt').forEach(opt=>opt.addEventListener('click',()=>{
+    const n=opt.dataset.name;const i=editAssigned.indexOf(n);
+    if(i>=0)editAssigned.splice(i,1);else editAssigned.push(n);
+    renderAssignChips();renderPickList(document.getElementById('fa-search').value.toLowerCase());
+  }));
+}
+async function saveFact(){
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  const fields={factId:editFactId,question:val('f-q'),answer:val('f-a'),cardStatus:val('f-cs'),assignedDecks:editAssigned.join('|')};
+  try{await apiUpdateFact(fields);
+    const f=facts.find(x=>String(get(x,'factId'))===String(editFactId));
+    if(f){if(COL.question)f[COL.question]=fields.question;if(COL.answer)f[COL.answer]=fields.answer;
+      if(COL.cardStatus)f[COL.cardStatus]=fields.cardStatus;
+      if(COL.assignedDecks)f[COL.assignedDecks]=fields.assignedDecks;else f['Assigned Decks']=fields.assignedDecks;}
+    save(FACTS_KEY,facts);refreshFilters();renderFactChips();renderFacts();closeSheet();toast('Saved ✓');
+  }catch(e){toast('Save failed: '+e.message,true);btn.disabled=false;btn.textContent='Save to sheet';}
+}
+
+/* ════════════ SOURCES ════════════ */
+const SRC_LABEL={book:'Book',podcast:'Podcast',paper:'Paper',article:'Article',website:'Website',documentary:'Documentary',other:'Other'};
+function citation(s){
+  const a=s.author||'',y=s.year?'('+s.year+')':'',t=s.title||'',p=s.publisher||'',u=s.url||'';
+  if(s.type==='book')return [a,y,t,p].filter(Boolean).join('. ')+'.';
+  if(s.type==='paper')return [a,y,'"'+t+'"',p,u].filter(Boolean).join('. ')+'.';
+  if(s.type==='podcast')return [t,a?'Host: '+a:'',y,u].filter(Boolean).join('. ')+'.';
+  if(s.type==='article')return [a,y,'"'+t+'"',p,u].filter(Boolean).join('. ')+'.';
+  if(s.type==='website')return [t,y,u].filter(Boolean).join('. ')+'.';
+  if(s.type==='documentary')return [t,y,'[Documentary]',p].filter(Boolean).join('. ')+'.';
+  return [a,y,t,p].filter(Boolean).join('. ')+'.';
+}
+function renderSources(){
+  const q=val('sources-search').toLowerCase(),type=val('sf-type'),deck=val('sf-deck');
+  let list=sources.filter(s=>{
+    if(q&&!((s.title||'')+' '+(s.author||'')+' '+(s.notes||'')).toLowerCase().includes(q))return false;
+    if(type&&s.type!==type)return false; if(deck&&!(s.deckIds||[]).includes(deck))return false; return true;
+  });
+  document.getElementById('sources-count').textContent=sources.length+' total';
+  document.getElementById('sources-list').innerHTML=list.length?list.map(s=>{
+    const linked=decks.filter(d=>(s.deckIds||[]).includes(d.id));
+    return `<div class="item" onclick="openSource('${s.id}')">
+      <div class="item-title">${esc(s.title||'(untitled)')}</div>
+      <div class="item-meta" style="margin-top:5px">
+        <span class="badge b-cat">${SRC_LABEL[s.type]||'Other'}</span>
+        ${s.author?`<span>${esc(s.author)}</span>`:''}${s.year?`<span>· ${esc(s.year)}</span>`:''}
+      </div>
+      ${s.notes?`<div class="item-sub">${esc(clip(s.notes,150))}</div>`:''}
+      ${linked.length?`<div class="item-meta" style="margin-top:6px">${linked.map(d=>`<span class="badge b-deck">${esc(d.title)}</span>`).join('')}</div>`:''}
+      ${s.url?`<div class="item-meta" style="margin-top:6px"><a href="${attr(s.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open link ↗</a></div>`:''}
+    </div>`;
+  }).join(''):emptyState('📚','No sources','Tap + to capture one.');
+}
+function openSource(id){
+  const s=id?sources.find(x=>x.id===id):null;
+  linkSel=s?[...(s.deckIds||[])]:[];
+  sheetTitle(s?'Edit source':'New source');
+  body(`
+    <span class="label">Title *</span><input class="field" id="s-title" value="${attr(s?.title)}" placeholder="Book / article / podcast title">
+    <div class="two">
+      <div><span class="label">Type</span><select class="field" id="s-type">${opts(['book','podcast','paper','article','website','documentary','other'],s?.type||'book',SRC_LABEL)}</select></div>
+      <div><span class="label">Year</span><input class="field" id="s-year" inputmode="numeric" value="${attr(s?.year)}" placeholder="2021"></div>
+    </div>
+    <span class="label">Author(s)</span><input class="field" id="s-author" value="${attr(s?.author)}" placeholder="Last, First or host">
+    <span class="label">Publisher / network</span><input class="field" id="s-pub" value="${attr(s?.publisher)}" placeholder="Publisher, journal, network">
+    <div class="two">
+      <div><span class="label">URL</span><input class="field" id="s-url" type="url" inputmode="url" value="${attr(s?.url)}" placeholder="https://…"></div>
+      <div><span class="label">ISBN / DOI</span><input class="field" id="s-isbn" value="${attr(s?.isbn)}" placeholder="ISBN / DOI"></div>
+    </div>
+    <span class="label">Notes</span><textarea class="field" id="s-notes" placeholder="Which facts, page numbers, timestamps…">${esc(s?.notes||'')}</textarea>
+    <span class="label">Linked decks</span><div class="toggle-list" id="s-decks">${deckToggles(linkSel)}</div>
+    <button class="btn-primary" id="saveBtn" onclick="saveSource('${id||''}')">${s?'Save source':'Add source'}</button>
+    ${s?`<div class="btn-row"><button class="btn-ghost" onclick="copyCite('${id}')">Copy citation</button><button class="btn-del" onclick="delItem('Sources','${id}')">Delete</button></div>`:''}
+  `);
+  bindDeckToggles('s-decks');
+  openSheet();
+}
+async function saveSource(id){
+  const title=val('s-title').trim(); if(!title)return toast('Title is required',true);
+  const btn=document.getElementById('saveBtn');btn.disabled=true;btn.textContent='Saving…';
+  const existing=id?sources.find(s=>s.id===id):null;
+  const item={id:id||uid('src'),title,type:val('s-type'),author:val('s-author').trim(),year:val('s-year').trim(),
+    publisher:val('s-pub').trim(),url:val('s-url').trim(),isbn:val('s-isbn').trim(),notes:val('s-notes').trim(),
+    deckIds:[...linkSel],createdAt:existing?existing.createdAt:today()};
+  try{await apiSaveItem('Sources',item);
+    if(existing)Object.assign(existing,item);else sources.push(item);
+    save(SRC_KEY,sources);renderSources();closeSheet();toast(id?'Source updated ✓':'Source added ✓');
   }catch(e){toast('Save failed: '+e.message,true);btn.disabled=false;btn.textContent='Add source';}
 }
+function copyCite(id){const s=sources.find(x=>x.id===id);if(!s)return;const txt=citation(s);
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('Citation copied ✓')).catch(()=>{const el=document.createElement('textarea');el.value=txt;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);toast('Citation copied ✓');});}
 
-/* ════════════ SHEET / MODAL ════════════ */
+/* ════════════ DELETE ════════════ */
+async function delItem(sheet,id){
+  if(!confirm('Delete this '+sheet.slice(0,-1).toLowerCase()+'? This removes it from the sheet.'))return;
+  try{await apiDeleteItem(sheet,id);
+    if(sheet==='Decks'){decks=decks.filter(d=>d.id!==id);save(DECKS_KEY,decks);refreshFilters();renderDecks();renderDashboard();}
+    if(sheet==='Sources'){sources=sources.filter(s=>s.id!==id);save(SRC_KEY,sources);renderSources();}
+    if(sheet==='Tasks'){tasks=tasks.filter(t=>t.id!==id);save(TASKS_KEY,tasks);renderTasks();renderDashboard();}
+    closeSheet();toast('Deleted ✓');
+  }catch(e){toast('Delete failed: '+e.message,true);}
+}
+
+/* ════════════ LINKED-DECK TOGGLES (tasks/sources) ════════════ */
+let linkSel=[];
+function deckToggles(sel){
+  if(!decks.length)return `<span style="font-size:13px;color:var(--text-muted)">No decks yet.</span>`;
+  return decks.map(d=>`<button type="button" class="tg${sel.includes(d.id)?' on':''}" data-id="${d.id}">${esc(d.title)}</button>`).join('');
+}
+function bindDeckToggles(containerId){
+  document.querySelectorAll('#'+containerId+' .tg').forEach(b=>b.addEventListener('click',()=>{
+    const id=b.dataset.id;const i=linkSel.indexOf(id);
+    if(i>=0){linkSel.splice(i,1);b.classList.remove('on');}else{linkSel.push(id);b.classList.add('on');}
+  }));
+}
+
+/* ════════════ FILTER POPULATION ════════════ */
+function refreshFilters(){
+  // deck tag filter
+  setSelect('df-tag','All tags',allTags().map(t=>[t,t]),val('df-tag'));
+  // facts deck filter — target + assigned deck names + deck titles
+  const nameSet=new Set(decks.map(d=>d.title).filter(Boolean));
+  facts.forEach(f=>{const td=get(f,'targetDeck');if(td)nameSet.add(td);String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean).forEach(n=>nameSet.add(n));});
+  setSelect('ff-deck','All decks',[...nameSet].sort().map(n=>[n,n]),val('ff-deck'));
+  // sources deck filter (by id)
+  setSelect('sf-deck','All decks',decks.map(d=>[d.id,d.title]),val('sf-deck'));
+}
+function setSelect(id,allLabel,pairs,cur){
+  const sel=document.getElementById(id);if(!sel)return;
+  sel.innerHTML=`<option value="">${allLabel}</option>`+pairs.map(([v,l])=>`<option value="${attr(v)}">${esc(l)}</option>`).join('');
+  if(pairs.some(([v])=>v===cur))sel.value=cur;
+}
+
+/* ════════════ SHEET / HELPERS ════════════ */
+function sheetTitle(t){document.getElementById('sheet-title').textContent=t;}
+function body(html){document.getElementById('sheet-body').innerHTML=html;document.getElementById('sheet').scrollTop=0;}
 function openSheet(){document.getElementById('scrim').classList.add('open');document.getElementById('sheet').classList.add('open');document.body.style.overflow='hidden';}
 function closeSheet(){document.getElementById('scrim').classList.remove('open');document.getElementById('sheet').classList.remove('open');document.body.style.overflow='';}
+function renderAll(){renderDashboard();renderTasks();renderDecks();renderFactChips();renderFacts();renderSources();}
 
-/* ════════════ HELPERS ════════════ */
-function renderAll(){renderFactChips();renderFacts();renderDecks();renderSources();}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
+function num(v){return Number(v)||0;}
+function arr(v){return Array.isArray(v)?v:(v?String(v).split('|').filter(Boolean):[]);}
+function allTags(){const s=new Set();decks.forEach(d=>arr(d.tags).forEach(t=>s.add(t)));return [...s].sort();}
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+function today(){return new Date().toISOString().slice(0,10);}
+function cap(s){s=String(s||'');return s.charAt(0).toUpperCase()+s.slice(1);}
 function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function attr(s){return esc(s==null?'':s);}
 function clip(s,n){s=String(s??'');return s.length>n?s.slice(0,n-1)+'…':s;}
-function todayStr(){return new Date().toISOString().slice(0,10);}
+function opts(values,cur,labels){return values.map(v=>{const l=labels?(labels[v]||v||'—'):(v||'— select —');return `<option value="${attr(v)}"${v===cur?' selected':''}>${esc(l)}</option>`;}).join('');}
 function emptyState(big,t,sub){return `<div class="empty"><span class="big">${big}</span><b>${t}</b><br>${sub}</div>`;}
-let toastT;
-function toast(msg,err){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2600);}
+let toastT;function toast(msg,err){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2600);}
 
-/* ════════════ CONNECT FLOW ════════════ */
-function showApp(){
-  document.getElementById('connectScreen').style.display='none';
-  document.getElementById('app').style.display='block';
-  document.getElementById('tabbar').style.display='flex';
-}
-function showConnect(){
-  document.getElementById('connectScreen').style.display='block';
-  document.getElementById('app').style.display='none';
-  document.getElementById('tabbar').style.display='none';
-  document.getElementById('fab').classList.remove('show');
-}
+/* ════════════ CONNECT ════════════ */
+function showApp(){document.getElementById('connectScreen').style.display='none';document.getElementById('app').style.display='block';document.getElementById('tabbar').style.display='flex';nav('dashboard');}
+function showConnect(){document.getElementById('connectScreen').style.display='block';document.getElementById('app').style.display='none';document.getElementById('tabbar').style.display='none';document.getElementById('fab').classList.remove('show');}
 function connect(){
   const v=document.getElementById('urlInput').value.trim();
-  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(v)){
-    toast('That must be a /exec Apps Script URL',true);return;
-  }
-  sheetUrl=v;localStorage.setItem(URL_KEY,sheetUrl);
-  showApp();pullAll();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(v))return toast('That must be a /exec Apps Script URL',true);
+  sheetUrl=v;localStorage.setItem(URL_KEY,sheetUrl);showApp();pullAll();
 }
 function changeUrl(){
   const v=prompt('Apps Script Web App URL (blank to disconnect):',sheetUrl);
@@ -663,14 +905,9 @@ function changeUrl(){
 }
 
 /* ════════════ BOOT ════════════ */
-if(facts.length) buildColMap(facts[0]);
-if(sheetUrl){ showApp(); renderAll(); updateTopSub(); pullAll(); }
-else showConnect();
-
-/* register service worker for installability */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
+if(facts.length)buildColMap(facts[0]);
+if(sheetUrl){showApp();refreshFilters();renderAll();updateTopSub();pullAll();}else showConnect();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 </script>
 </body>
 </html>

@@ -2,7 +2,7 @@
    Caches the app shell so it installs to the home screen and opens
    instantly. Network-first for the live Apps Script data; the shell
    is served cache-first. Bump CACHE on every release.            */
-const CACHE = 'coa-mobile-v1';
+const CACHE = 'coa-mobile-v2';
 const SHELL = [
   './',
   './index.html',
