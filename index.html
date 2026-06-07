@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1B4E49">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cards">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Cards of Alexandria — Mobile</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF3E2; --surface:#FFFAF0; --surface-alt:#F0E6CC;
+  --primary:#E04E2C; --primary-lt:#F5B49C; --secondary:#38A08C;
+  --accent:#E8A82C; --text:#2C1A0E; --text-muted:#7A5F48;
+  --border:#E2CFB0; --sidebar:#1B4E49; --sidebar-txt:#FBF3E2; --radius:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{overscroll-behavior-y:none;}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+  font-size:15px;line-height:1.45;min-height:100vh;min-height:100dvh;
+  padding-bottom:calc(66px + env(safe-area-inset-bottom));
+}
+h1,h2,h3{font-family:'Playfair Display',serif;}
+button{font-family:inherit;cursor:pointer;}
+input,textarea,select{font-family:inherit;font-size:16px;}/*16px stops iOS zoom*/
+
+/* ── Top bar ── */
+.topbar{
+  position:sticky;top:0;z-index:40;background:var(--sidebar);color:var(--sidebar-txt);
+  padding:calc(12px + env(safe-area-inset-top)) 16px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  box-shadow:0 2px 10px rgba(0,0,0,.12);
+}
+.topbar h1{font-size:18px;font-weight:700;line-height:1.1;}
+.topbar .sub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(245,237,216,.5);margin-top:2px;}
+.sync-btn{
+  background:rgba(255,255,255,.12);color:var(--sidebar-txt);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:8px 14px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.sync-btn:disabled{opacity:.55;}
+.sync-btn .spin{display:inline-block;}
+.syncing .spin{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Views ── */
+main{padding:14px 14px 8px;max-width:680px;margin:0 auto;}
+.view{display:none;}
+.view.active{display:block;animation:fade .2s;}
+@keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.view-head{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 12px;}
+.view-head h2{font-size:22px;font-weight:700;}
+.view-head .count{font-size:12px;color:var(--text-muted);font-weight:500;}
+
+/* ── Search + filter ── */
+.search{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:11px 14px;font-size:15px;color:var(--text);margin-bottom:10px;
+}
+.search::placeholder{color:var(--text-muted);}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none;-ms-overflow-style:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{
+  flex:0 0 auto;background:var(--surface);border:1px solid var(--border);border-radius:18px;
+  padding:6px 13px;font-size:13px;font-weight:500;color:var(--text-muted);white-space:nowrap;
+}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.chip .n{opacity:.7;font-weight:600;margin-left:4px;}
+
+/* ── Cards / list items ── */
+.item{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(44,26,14,.04);
+}
+.item:active{transform:scale(.992);}
+.item-title{font-weight:600;font-size:15px;line-height:1.35;margin-bottom:5px;}
+.item-meta{font-size:12.5px;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;}
+.item-sub{font-size:13.5px;color:var(--text-muted);margin-top:6px;line-height:1.4;}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:11px;white-space:nowrap;}
+.badge-deck{background:#EAF6F3;color:#1B7A6A;}
+.badge-status{background:var(--surface-alt);color:var(--text-muted);}
+.badge-tag{background:#FBEFE4;color:#9A5A30;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:0 0 auto;}
+
+.empty{text-align:center;color:var(--text-muted);padding:46px 20px;font-size:14px;}
+.empty .big{font-size:34px;display:block;margin-bottom:10px;opacity:.5;}
+
+/* ── Bottom nav ── */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--surface);
+  border-top:1px solid var(--border);display:flex;
+  padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 12px rgba(44,26,14,.06);
+}
+.tab{
+  flex:1;border:none;background:none;padding:9px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--text-muted);font-size:10.5px;font-weight:600;letter-spacing:.02em;
+}
+.tab .ico{font-size:20px;line-height:1;}
+.tab.active{color:var(--primary);}
+
+/* ── Floating add button ── */
+.fab{
+  position:fixed;right:18px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:45;
+  width:54px;height:54px;border-radius:50%;background:var(--primary);color:#fff;border:none;
+  font-size:28px;line-height:1;box-shadow:0 6px 18px rgba(224,78,44,.4);display:none;align-items:center;justify-content:center;
+}
+.fab.show{display:flex;}
+
+/* ── Bottom sheet / modal ── */
+.scrim{position:fixed;inset:0;background:rgba(40,22,10,.45);z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;}
+.scrim.open{opacity:1;pointer-events:auto;}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--bg);
+  border-radius:20px 20px 0 0;max-height:92vh;max-height:92dvh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.32,.72,0,1);
+  padding-bottom:calc(20px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 30px rgba(0,0,0,.2);
+}
+.sheet.open{transform:translateY(0);}
+.sheet-grip{width:38px;height:4px;background:var(--border);border-radius:3px;margin:9px auto 4px;}
+.sheet-head{position:sticky;top:0;background:var(--bg);padding:6px 18px 12px;border-bottom:1px solid var(--border);z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.sheet-head h3{font-size:18px;font-weight:700;}
+.sheet-close{background:var(--surface-alt);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;color:var(--text-muted);flex:0 0 auto;}
+.sheet-body{padding:16px 18px 8px;}
+
+.label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:14px 0 6px;display:block;}
+.label:first-child{margin-top:0;}
+.field{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:11px 13px;font-size:16px;color:var(--text);
+}
+textarea.field{min-height:84px;resize:vertical;line-height:1.5;}
+select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%237A5F48' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;}
+
+.readbox{background:var(--surface-alt);border-radius:10px;padding:12px 13px;font-size:14.5px;line-height:1.5;color:var(--text);}
+.readmeta{font-size:12px;color:var(--text-muted);margin-top:8px;}
+
+/* deck toggle chips inside fact editor */
+.deck-toggles{display:flex;flex-wrap:wrap;gap:7px;}
+.deck-toggle{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:7px 13px;font-size:13.5px;font-weight:500;color:var(--text-muted);
+}
+.deck-toggle.on{background:#EAF6F3;border-color:var(--secondary);color:#1B7A6A;}
+.deck-toggle.on::before{content:"✓ ";font-weight:700;}
+
+.btn-primary{
+  width:100%;background:var(--primary);color:#fff;border:none;border-radius:12px;
+  padding:14px;font-size:16px;font-weight:600;margin-top:20px;
+}
+.btn-primary:disabled{opacity:.55;}
+.btn-ghost{width:100%;background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:12px;padding:12px;font-size:14px;font-weight:500;margin-top:10px;}
+
+/* ── Connect screen ── */
+.connect{max-width:520px;margin:30px auto;padding:0 18px;text-align:center;}
+.connect .logo{font-size:46px;margin-bottom:8px;}
+.connect h2{font-size:24px;margin-bottom:8px;}
+.connect p{color:var(--text-muted);font-size:14px;margin-bottom:22px;line-height:1.55;}
+.connect .field{text-align:left;margin-bottom:6px;}
+.connect .hint{font-size:12px;color:var(--text-muted);text-align:left;margin-bottom:18px;}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:var(--text);color:var(--bg);padding:11px 18px;border-radius:24px;font-size:13.5px;font-weight:500;
+  z-index:90;opacity:0;pointer-events:none;transition:all .25s;max-width:88vw;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{background:var(--primary);color:#fff;}
+
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-alt) 50%,var(--surface) 75%);background-size:200% 100%;animation:sk 1.3s infinite;height:74px;border-radius:var(--radius);margin-bottom:10px;}
+@keyframes sk{to{background-position:-200% 0;}}
+.settings-link{font-size:12px;color:var(--text-muted);text-align:center;padding:14px;text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <h1>Cards of Alexandria</h1>
+    <div class="sub" id="topsub">Workshop</div>
+  </div>
+  <button class="sync-btn" id="syncBtn" onclick="pullAll()"><span class="spin">↻</span> Sync</button>
+</div>
+
+<!-- CONNECT SCREEN -->
+<div id="connectScreen" class="connect" style="display:none;">
+  <div class="logo">📇</div>
+  <h2>Connect your sheet</h2>
+  <p>Paste the same Apps Script Web App URL your desktop dashboard uses. This app reads and writes live to that one master Google Sheet.</p>
+  <input class="field" id="urlInput" type="url" inputmode="url" autocomplete="off"
+         placeholder="https://script.google.com/macros/s/…/exec">
+  <div class="hint">It must end in <b>/exec</b>. Find it in the desktop dashboard → Facts → Connect Google Sheets.</div>
+  <button class="btn-primary" style="margin-top:6px" onclick="connect()">Connect</button>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+  <main>
+    <!-- FACTS -->
+    <section id="view-facts" class="view active">
+      <div class="view-head"><h2>Facts</h2><span class="count" id="facts-count"></span></div>
+      <input class="search" id="facts-search" placeholder="Search facts…" oninput="renderFacts()">
+      <div class="chips" id="facts-chips"></div>
+      <div id="facts-list"></div>
+    </section>
+
+    <!-- DECKS -->
+    <section id="view-decks" class="view">
+      <div class="view-head"><h2>Decks</h2><span class="count" id="decks-count"></span></div>
+      <input class="search" id="decks-search" placeholder="Search decks…" oninput="renderDecks()">
+      <div id="decks-list"></div>
+    </section>
+
+    <!-- SOURCES -->
+    <section id="view-sources" class="view">
+      <div class="view-head"><h2>Sources</h2><span class="count" id="sources-count"></span></div>
+      <input class="search" id="sources-search" placeholder="Search sources…" oninput="renderSources()">
+      <div id="sources-list"></div>
+    </section>
+
+    <div class="settings-link" onclick="changeUrl()">⚙︎ Change sheet connection</div>
+  </main>
+</div>
+
+<button class="fab" id="fab" onclick="onFab()">+</button>
+
+<!-- BOTTOM NAV -->
+<nav class="tabbar" id="tabbar" style="display:none;">
+  <button class="tab active" data-v="facts" onclick="nav('facts')"><span class="ico">📝</span>Facts</button>
+  <button class="tab" data-v="decks" onclick="nav('decks')"><span class="ico">🃏</span>Decks</button>
+  <button class="tab" data-v="sources" onclick="nav('sources')"><span class="ico">📚</span>Sources</button>
+</nav>
+
+<!-- SHEET / MODAL -->
+<div class="scrim" id="scrim" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-grip"></div>
+  <div class="sheet-head"><h3 id="sheet-title"></h3><button class="sheet-close" onclick="closeSheet()">×</button></div>
+  <div class="sheet-body" id="sheet-body"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   Cards of Alexandria — Mobile companion
+   Talks to the SAME deployed Apps Script Web App as the desktop
+   dashboard. Pure GET requests (Apps Script 302-redirects POST→GET,
+   so every write goes through doGet just like the desktop app).
+   ════════════════════════════════════════════════════════════ */
+const URL_KEY='coa_m_url', FACTS_KEY='coa_m_facts', DECKS_KEY='coa_m_decks',
+      SRC_KEY='coa_m_sources', TIME_KEY='coa_m_time';
+
+let sheetUrl = localStorage.getItem(URL_KEY) || '';
+let facts    = JSON.parse(localStorage.getItem(FACTS_KEY)||'[]');
+let decks    = JSON.parse(localStorage.getItem(DECKS_KEY)||'[]');
+let sources  = JSON.parse(localStorage.getItem(SRC_KEY)||'[]');
+let COL={}, activeStatus='', curView='facts';
+
+/* ── Flexible column mapping (mirrors desktop buildColMap) ── */
+function buildColMap(sample){
+  if(!sample) return;
+  const keys=Object.keys(sample);
+  const norm=k=>k.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const normed=keys.map(norm);
+  const find=(...t)=>{t=t.map(x=>x.toLowerCase());const i=normed.findIndex(k=>t.every(x=>k.includes(x)));return i>=0?keys[i]:null;};
+  COL={
+    factId:find('fact id')||find('fact','id')||keys[0],
+    story:find('fact','story')||find('story')||find('fact','text')||find('candidate'),
+    bookTitle:find('book','title')||find('book')||find('source','title'),
+    author:find('author'),
+    sourceType:find('source','type'),
+    genre:find('genre'),
+    tags:find('tags'),
+    targetDeck:find('target','deck'),
+    question:find('question'),
+    answer:find('answer'),
+    cardStatus:find('card','status'),
+    assignedDecks:find('assigned','decks')||find('assigned deck'),
+  };
+}
+const get=(f,k)=>COL[k]?(f[COL[k]]??''):'';
+
+/* ── Card-status palette (mirrors desktop CS_META) ── */
+const CS_META=[
+  {key:'',label:'Unset',color:'#7A5F48'},
+  {key:'Draft',label:'Draft',color:'#8A6060'},
+  {key:'Needs Deck Assignment',label:'Needs Deck',color:'#B85000'},
+  {key:'Needs Fact Check',label:'Fact Check',color:'#6838B8'},
+  {key:'Needs Copy Edit',label:'Copy Edit',color:'#3858C8'},
+  {key:'Needs Design Review',label:'Design',color:'#1860C8'},
+  {key:'Done',label:'Done',color:'#38A08C'},
+];
+const csColor=k=>(CS_META.find(m=>m.key===k)||CS_META[0]).color;
+
+/* ════════════ NETWORKING ════════════ */
+function base(){return sheetUrl.includes('?')?sheetUrl+'&':sheetUrl+'?';}
+
+async function apiRead(){
+  const res=await fetch(sheetUrl+'?action=read&t='+Date.now(),{redirect:'follow'});
+  const data=await res.json();
+  if(data.error) throw new Error(data.error);
+  return data;
+}
+async function apiUpdateFact(fields){
+  // The deployed Apps Script runs decodeURIComponent() on these four text
+  // fields, so they must be DOUBLE-encoded (encodeURIComponent here +
+  // URLSearchParams encoding again) — exactly what the desktop app sends.
+  // factId is passed raw (single-encoded by URLSearchParams). The live
+  // desktop uses action 'update'; we fall back to 'updateFact' (v3) if a
+  // deployment only recognises that name.
+  function buildParams(action){
+    const p=new URLSearchParams({action, factId:String(fields.factId)});
+    ['question','answer','cardStatus','assignedDecks'].forEach(k=>{
+      p.set(k, encodeURIComponent(fields[k]==null?'':String(fields[k])));
+    });
+    return p;
+  }
+  let res=await fetch(base()+buildParams('update').toString(),{redirect:'follow'});
+  let r=await res.json();
+  if(r.error && /unknown action/i.test(r.error)){
+    res=await fetch(base()+buildParams('updateFact').toString(),{redirect:'follow'});
+    r=await res.json();
+  }
+  if(r.error) throw new Error(r.error);
+  return r;
+}
+async function apiSaveItem(sheet,item){
+  const p=new URLSearchParams({action:'saveItem',sheet,item:JSON.stringify(item)});
+  const res=await fetch(base()+p.toString(),{redirect:'follow'});
+  const r=await res.json(); if(r.error) throw new Error(r.error); return r;
+}
+
+/* ════════════ SYNC ════════════ */
+let syncing=false;
+async function pullAll(){
+  if(!sheetUrl||syncing) return;
+  syncing=true;
+  const btn=document.getElementById('syncBtn');
+  btn.classList.add('syncing'); btn.disabled=true;
+  document.getElementById('topsub').textContent='Syncing…';
+  try{
+    const data=await apiRead();
+    facts   = data.facts   || [];
+    decks   = data.decks   || [];
+    sources = data.sources || [];
+    if(facts.length) buildColMap(facts[0]);
+    localStorage.setItem(FACTS_KEY,JSON.stringify(facts));
+    localStorage.setItem(DECKS_KEY,JSON.stringify(decks));
+    localStorage.setItem(SRC_KEY,JSON.stringify(sources));
+    localStorage.setItem(TIME_KEY,new Date().toISOString());
+    renderAll(); updateTopSub();
+    toast(`Synced · ${facts.length} facts · ${decks.length} decks`);
+  }catch(e){
+    toast('Sync failed: '+e.message,true);
+    updateTopSub();
+  }finally{
+    syncing=false; btn.classList.remove('syncing'); btn.disabled=false;
+  }
+}
+function updateTopSub(){
+  const t=localStorage.getItem(TIME_KEY);
+  document.getElementById('topsub').textContent = t
+    ? 'Synced '+new Date(t).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})
+    : 'Workshop';
+}
+
+/* ════════════ NAV ════════════ */
+function nav(v){
+  curView=v;
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
+  const fab=document.getElementById('fab');
+  fab.classList.toggle('show', v==='decks'||v==='sources');
+  window.scrollTo(0,0);
+}
+function onFab(){ curView==='decks'?openDeckForm():openSourceForm(); }
+
+/* ════════════ RENDER: FACTS ════════════ */
+function renderFactChips(){
+  const counts={}; CS_META.forEach(m=>counts[m.key]=0);
+  facts.forEach(f=>{const cs=get(f,'cardStatus')||'';counts[cs]!==undefined?counts[cs]++:counts['']++;});
+  const total=facts.length;
+  let html=`<button class="chip${activeStatus===''?' active':''}" onclick="setStatus('')">All<span class="n">${total}</span></button>`;
+  html+=CS_META.filter(m=>m.key!=='').map(m=>
+    `<button class="chip${activeStatus===m.key?' active':''}" onclick="setStatus('${m.key.replace(/'/g,"\\'")}')">${m.label}<span class="n">${counts[m.key]||0}</span></button>`
+  ).join('');
+  document.getElementById('facts-chips').innerHTML=html;
+}
+function setStatus(k){activeStatus=k;renderFactChips();renderFacts();}
+
+function renderFacts(){
+  const q=(document.getElementById('facts-search').value||'').toLowerCase();
+  let list=facts.slice();
+  if(activeStatus!=='') list=list.filter(f=>(get(f,'cardStatus')||'')===activeStatus);
+  if(q) list=list.filter(f=>(
+    get(f,'story')+' '+get(f,'question')+' '+get(f,'answer')+' '+get(f,'bookTitle')+' '+get(f,'assignedDecks')
+  ).toLowerCase().includes(q));
+  document.getElementById('facts-count').textContent=list.length+' shown';
+  const el=document.getElementById('facts-list');
+  if(!list.length){el.innerHTML=emptyState('📝','No facts match','Sync, or adjust your search and filters.');return;}
+  el.innerHTML=list.map(f=>{
+    const id=get(f,'factId');
+    const title=get(f,'question')||get(f,'story')||'(untitled fact)';
+    const cs=get(f,'cardStatus')||'';
+    const ad=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
+    const decksBadges=ad.length?ad.map(d=>`<span class="badge badge-deck">${esc(d)}</span>`).join(''):'';
+    return `<div class="item" onclick="openFact('${esc(id)}')">
+      <div class="item-title">${esc(clip(title,140))}</div>
+      <div class="item-meta">
+        <span class="dot" style="background:${csColor(cs)}"></span>
+        <span>${esc(cs||'Unset')}</span>
+        ${get(f,'bookTitle')?`<span>· ${esc(clip(get(f,'bookTitle'),34))}</span>`:''}
+      </div>
+      ${decksBadges?`<div class="item-meta" style="margin-top:7px">${decksBadges}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ── Fact editor sheet: assign decks + rewrite Q/A + status ── */
+let editFactId=null, editAssigned=[];
+function openFact(id){
+  const f=facts.find(x=>String(get(x,'factId'))===String(id));
+  if(!f){toast('Fact not found — try syncing',true);return;}
+  editFactId=id;
+  editAssigned=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
+  const story=get(f,'story'); const cs=get(f,'cardStatus')||'';
+  const deckNames=[...new Set(decks.map(d=>d.title).filter(Boolean))];
+  // include any assigned decks not in the decks list (e.g. target deck typed manually)
+  editAssigned.forEach(a=>{if(!deckNames.includes(a))deckNames.push(a);});
+
+  document.getElementById('sheet-title').textContent='Edit fact';
+  document.getElementById('sheet-body').innerHTML=`
+    ${story?`<span class="label">Original fact</span><div class="readbox">${esc(story)}</div>
+      <div class="readmeta">${esc(get(f,'bookTitle')||'')}${get(f,'author')?' — '+esc(get(f,'author')):''}</div>`:''}
+
+    <span class="label">Assign to decks</span>
+    <div class="deck-toggles" id="deckToggles">
+      ${deckNames.length?deckNames.map(n=>
+        `<button type="button" class="deck-toggle${editAssigned.includes(n)?' on':''}" onclick="toggleDeck(this,'${esc(n).replace(/'/g,"\\'")}')">${esc(n)}</button>`
+      ).join(''):'<span style="font-size:13px;color:var(--text-muted)">No decks yet — add one in the Decks tab.</span>'}
+    </div>
+
+    <span class="label">Card question (front)</span>
+    <textarea class="field" id="f-question" placeholder="The hook / question printed on the front…">${esc(get(f,'question'))}</textarea>
+
+    <span class="label">Card answer (back)</span>
+    <textarea class="field" id="f-answer" placeholder="The fact / answer with context…">${esc(get(f,'answer'))}</textarea>
+
+    <span class="label">Card status</span>
+    <select class="field" id="f-status">
+      ${CS_META.map(m=>`<option value="${esc(m.key)}"${cs===m.key?' selected':''}>${m.key||'Unset'}</option>`).join('')}
+    </select>
+
+    <button class="btn-primary" id="saveFactBtn" onclick="saveFact()">Save to sheet</button>
+  `;
+  openSheet();
+}
+function toggleDeck(btn,name){
+  const i=editAssigned.indexOf(name);
+  if(i>=0){editAssigned.splice(i,1);btn.classList.remove('on');}
+  else{editAssigned.push(name);btn.classList.add('on');}
+}
+async function saveFact(){
+  const btn=document.getElementById('saveFactBtn');
+  btn.disabled=true;btn.textContent='Saving…';
+  const fields={
+    factId:editFactId,
+    question:document.getElementById('f-question').value,
+    answer:document.getElementById('f-answer').value,
+    cardStatus:document.getElementById('f-status').value,
+    assignedDecks:editAssigned.join('|'),
+  };
+  try{
+    await apiUpdateFact(fields);
+    // reflect locally
+    const f=facts.find(x=>String(get(x,'factId'))===String(editFactId));
+    if(f){
+      if(COL.question)f[COL.question]=fields.question;
+      if(COL.answer)f[COL.answer]=fields.answer;
+      if(COL.cardStatus)f[COL.cardStatus]=fields.cardStatus;
+      if(COL.assignedDecks)f[COL.assignedDecks]=fields.assignedDecks;
+    }
+    localStorage.setItem(FACTS_KEY,JSON.stringify(facts));
+    renderFactChips();renderFacts();
+    closeSheet();toast('Saved ✓');
+  }catch(e){
+    toast('Save failed: '+e.message,true);
+    btn.disabled=false;btn.textContent='Save to sheet';
+  }
+}
+
+/* ════════════ RENDER: DECKS ════════════ */
+function renderDecks(){
+  const q=(document.getElementById('decks-search').value||'').toLowerCase();
+  let list=decks.slice();
+  if(q) list=list.filter(d=>((d.title||'')+' '+(d.subtitle||'')+' '+(Array.isArray(d.tags)?d.tags.join(' '):d.tags||'')).toLowerCase().includes(q));
+  document.getElementById('decks-count').textContent=decks.length+' total';
+  const el=document.getElementById('decks-list');
+  if(!list.length){el.innerHTML=emptyState('🃏','No decks yet','Tap + to capture a deck idea.');return;}
+  // count assigned facts per deck title
+  const fc={};
+  facts.forEach(f=>String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean).forEach(n=>fc[n]=(fc[n]||0)+1));
+  el.innerHTML=list.map(d=>{
+    const tags=Array.isArray(d.tags)?d.tags:(d.tags?String(d.tags).split('|'):[]);
+    const assigned=fc[d.title]||0;
+    return `<div class="item">
+      <div class="item-title">${esc(d.title||'(untitled)')}</div>
+      ${d.subtitle?`<div class="item-sub">${esc(d.subtitle)}</div>`:''}
+      <div class="item-meta" style="margin-top:8px">
+        <span class="badge badge-status">${esc(d.status||'planned')}</span>
+        <span class="badge badge-deck">${assigned} fact${assigned===1?'':'s'}</span>
+        ${tags.filter(Boolean).slice(0,3).map(t=>`<span class="badge badge-tag">${esc(t)}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+function openDeckForm(){
+  document.getElementById('sheet-title').textContent='New deck idea';
+  document.getElementById('sheet-body').innerHTML=`
+    <span class="label">Title *</span>
+    <input class="field" id="d-title" placeholder="e.g. History of Salt">
+    <span class="label">Subtitle</span>
+    <input class="field" id="d-subtitle" placeholder="One-line hook">
+    <span class="label">Tags (comma-separated)</span>
+    <input class="field" id="d-tags" placeholder="food-history, science">
+    <span class="label">Status</span>
+    <select class="field" id="d-status">
+      <option value="planned" selected>planned</option>
+      <option value="focus">focus</option>
+      <option value="complete">complete</option>
+    </select>
+    <button class="btn-primary" id="saveDeckBtn" onclick="saveDeck()">Add deck</button>
+  `;
+  openSheet();
+}
+async function saveDeck(){
+  const title=document.getElementById('d-title').value.trim();
+  if(!title){toast('Title is required',true);return;}
+  const btn=document.getElementById('saveDeckBtn');btn.disabled=true;btn.textContent='Saving…';
+  const item={
+    id:'d'+Date.now(), title,
+    subtitle:document.getElementById('d-subtitle').value.trim(),
+    description:'',
+    status:document.getElementById('d-status').value,
+    facts:0, expansionPages:0,
+    tags:document.getElementById('d-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    createdAt:todayStr(),
+  };
+  try{
+    await apiSaveItem('Decks',item);
+    decks.push(item);
+    localStorage.setItem(DECKS_KEY,JSON.stringify(decks));
+    renderDecks();closeSheet();toast('Deck added ✓');
+  }catch(e){toast('Save failed: '+e.message,true);btn.disabled=false;btn.textContent='Add deck';}
+}
+
+/* ════════════ RENDER: SOURCES ════════════ */
+function renderSources(){
+  const q=(document.getElementById('sources-search').value||'').toLowerCase();
+  let list=sources.slice();
+  if(q) list=list.filter(s=>((s.title||'')+' '+(s.author||'')+' '+(s.type||'')+' '+(s.notes||'')).toLowerCase().includes(q));
+  document.getElementById('sources-count').textContent=sources.length+' total';
+  const el=document.getElementById('sources-list');
+  if(!list.length){el.innerHTML=emptyState('📚','No sources yet','Tap + to capture something you found.');return;}
+  el.innerHTML=list.map(s=>`<div class="item">
+    <div class="item-title">${esc(s.title||'(untitled)')}</div>
+    <div class="item-meta" style="margin-top:5px">
+      <span class="badge badge-status">${esc(s.type||'other')}</span>
+      ${s.author?`<span>${esc(s.author)}</span>`:''}${s.year?`<span>· ${esc(s.year)}</span>`:''}
+    </div>
+    ${s.notes?`<div class="item-sub">${esc(clip(s.notes,160))}</div>`:''}
+    ${s.url?`<div class="item-meta" style="margin-top:6px"><a href="${esc(s.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--primary)">Open link ↗</a></div>`:''}
+  </div>`).join('');
+}
+function openSourceForm(){
+  document.getElementById('sheet-title').textContent='New source';
+  document.getElementById('sheet-body').innerHTML=`
+    <span class="label">Title *</span>
+    <input class="field" id="s-title" placeholder="Book / article / podcast title">
+    <span class="label">Type</span>
+    <select class="field" id="s-type">
+      ${['book','podcast','paper','article','website','documentary','other'].map(t=>`<option value="${t}">${t}</option>`).join('')}
+    </select>
+    <span class="label">Author</span>
+    <input class="field" id="s-author" placeholder="Author / creator">
+    <span class="label">Year</span>
+    <input class="field" id="s-year" inputmode="numeric" placeholder="2021">
+    <span class="label">URL</span>
+    <input class="field" id="s-url" type="url" inputmode="url" placeholder="https://…">
+    <span class="label">Notes</span>
+    <textarea class="field" id="s-notes" placeholder="Why it's useful, what to mine from it…"></textarea>
+    <button class="btn-primary" id="saveSrcBtn" onclick="saveSource()">Add source</button>
+  `;
+  openSheet();
+}
+async function saveSource(){
+  const title=document.getElementById('s-title').value.trim();
+  if(!title){toast('Title is required',true);return;}
+  const btn=document.getElementById('saveSrcBtn');btn.disabled=true;btn.textContent='Saving…';
+  const item={
+    id:'src'+Date.now(), title,
+    type:document.getElementById('s-type').value,
+    author:document.getElementById('s-author').value.trim(),
+    year:document.getElementById('s-year').value.trim(),
+    publisher:'',
+    url:document.getElementById('s-url').value.trim(),
+    isbn:'',
+    notes:document.getElementById('s-notes').value.trim(),
+    deckIds:[],
+    createdAt:todayStr(),
+  };
+  try{
+    await apiSaveItem('Sources',item);
+    sources.push(item);
+    localStorage.setItem(SRC_KEY,JSON.stringify(sources));
+    renderSources();closeSheet();toast('Source added ✓');
+  }catch(e){toast('Save failed: '+e.message,true);btn.disabled=false;btn.textContent='Add source';}
+}
+
+/* ════════════ SHEET / MODAL ════════════ */
+function openSheet(){document.getElementById('scrim').classList.add('open');document.getElementById('sheet').classList.add('open');document.body.style.overflow='hidden';}
+function closeSheet(){document.getElementById('scrim').classList.remove('open');document.getElementById('sheet').classList.remove('open');document.body.style.overflow='';}
+
+/* ════════════ HELPERS ════════════ */
+function renderAll(){renderFactChips();renderFacts();renderDecks();renderSources();}
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function clip(s,n){s=String(s??'');return s.length>n?s.slice(0,n-1)+'…':s;}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function emptyState(big,t,sub){return `<div class="empty"><span class="big">${big}</span><b>${t}</b><br>${sub}</div>`;}
+let toastT;
+function toast(msg,err){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast',2600);}
+
+/* ════════════ CONNECT FLOW ════════════ */
+function showApp(){
+  document.getElementById('connectScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('tabbar').style.display='flex';
+}
+function showConnect(){
+  document.getElementById('connectScreen').style.display='block';
+  document.getElementById('app').style.display='none';
+  document.getElementById('tabbar').style.display='none';
+  document.getElementById('fab').classList.remove('show');
+}
+function connect(){
+  const v=document.getElementById('urlInput').value.trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(v)){
+    toast('That must be a /exec Apps Script URL',true);return;
+  }
+  sheetUrl=v;localStorage.setItem(URL_KEY,sheetUrl);
+  showApp();pullAll();
+}
+function changeUrl(){
+  const v=prompt('Apps Script Web App URL (blank to disconnect):',sheetUrl);
+  if(v===null)return;
+  if(!v.trim()){sheetUrl='';localStorage.removeItem(URL_KEY);showConnect();return;}
+  sheetUrl=v.trim();localStorage.setItem(URL_KEY,sheetUrl);toast('Connection updated');pullAll();
+}
+
+/* ════════════ BOOT ════════════ */
+if(facts.length) buildColMap(facts[0]);
+if(sheetUrl){ showApp(); renderAll(); updateTopSub(); pullAll(); }
+else showConnect();
+
+/* register service worker for installability */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
