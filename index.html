@@ -221,6 +221,14 @@ select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
 .connect .field{text-align:left;margin-bottom:6px;}
 .connect .hint{font-size:12px;color:var(--text-muted);text-align:left;margin-bottom:18px;}
 
+/* ── Active filter pills ── */
+.filter-pills{display:flex;flex-wrap:wrap;gap:6px;}
+.f-pill{
+  display:inline-flex;align-items:center;gap:5px;background:var(--primary);color:#fff;
+  border-radius:14px;padding:4px 10px 4px 11px;font-size:12px;font-weight:600;white-space:nowrap;
+}
+.f-pill .px{font-size:14px;line-height:1;opacity:.8;cursor:pointer;}
+
 .toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
   background:var(--text);color:var(--bg);padding:11px 18px;border-radius:24px;font-size:13.5px;font-weight:500;
   z-index:90;opacity:0;pointer-events:none;transition:all .25s;max-width:88vw;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.25);}
@@ -295,11 +303,22 @@ select.field{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xml
       <div class="view-head"><h2>Facts</h2><span class="count" id="facts-count"></span></div>
       <input class="search" id="facts-search" placeholder="Search facts…" oninput="renderFacts()">
       <div class="filter-row">
+        <select class="mini-sel" id="ff-source" onchange="renderFacts()"><option value="">All sources</option></select>
         <select class="mini-sel" id="ff-deck" onchange="renderFacts()"><option value="">All decks</option></select>
-        <select class="mini-sel" id="ff-qual" onchange="renderFacts()">
-          <option value="">Qualifies: all</option><option value="Yes">Qualifies: yes</option><option value="No">Qualifies: no</option>
+      </div>
+      <div class="filter-row">
+        <select class="mini-sel" id="ff-deck-status" onchange="renderFacts()">
+          <option value="">Deck: any</option>
+          <option value="unassigned">No deck assigned</option>
+          <option value="assigned">Has deck assigned</option>
+        </select>
+        <select class="mini-sel" id="ff-qr" onchange="renderFacts()">
+          <option value="">QR: all</option>
+          <option value="eligible">QR eligible</option>
+          <option value="not-eligible">Not QR eligible</option>
         </select>
       </div>
+      <div id="facts-active-filters" style="display:none;padding:2px 0 8px;"></div>
       <div class="chips" id="facts-chips"></div>
       <div id="facts-list"></div>
     </section>
@@ -655,16 +674,47 @@ function renderFactChips(){
   document.getElementById('facts-chips').innerHTML=html;
 }
 function setStatus(k){activeStatus=k;renderFactChips();renderFacts();}
+function qrEligible(f){
+  // QR expansion eligibility — uses the qrExp column; truthy values signal eligible
+  const v=String(get(f,'qrExp')||'').toLowerCase();
+  return v&&v!=='no'&&v!=='false'&&v!=='n'&&v!=='0'&&v!=='—'&&v!=='-';
+}
 function renderFacts(){
-  const q=val('facts-search').toLowerCase(),deck=val('ff-deck'),qual=val('ff-qual');
+  const q=val('facts-search').toLowerCase();
+  const src=val('ff-source');
+  const deck=val('ff-deck');
+  const deckStatus=val('ff-deck-status');   // '' | 'assigned' | 'unassigned'
+  const qrFilter=val('ff-qr');              // '' | 'eligible' | 'not-eligible'
+
   let list=facts.filter(f=>{
+    // card-status chip
     if(activeStatus!==''&&(get(f,'cardStatus')||'')!==activeStatus)return false;
-    if(deck){const t=get(f,'targetDeck')===deck;const a=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).includes(deck);if(!t&&!a)return false;}
-    if(qual==='Yes'&&!qualOk(f))return false; if(qual==='No'&&!qualNo(f))return false;
+    // source filter
+    if(src&&get(f,'bookTitle')!==src)return false;
+    // deck filter (specific deck)
+    if(deck){
+      const t=get(f,'targetDeck')===deck;
+      const a=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).includes(deck);
+      if(!t&&!a)return false;
+    }
+    // deck-status filter (has / has not)
+    if(deckStatus){
+      const ad=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
+      const hasDeck=ad.length>0;
+      if(deckStatus==='assigned'&&!hasDeck)return false;
+      if(deckStatus==='unassigned'&&hasDeck)return false;
+    }
+    // QR eligibility filter
+    if(qrFilter==='eligible'&&!qrEligible(f))return false;
+    if(qrFilter==='not-eligible'&&qrEligible(f))return false;
+    // text search
     if(q&&!([get(f,'story'),get(f,'factId'),get(f,'question'),get(f,'answer'),get(f,'bookTitle')].join(' ').toLowerCase().includes(q)))return false;
     return true;
   });
+
   document.getElementById('facts-count').textContent=list.length+' of '+facts.length;
+  renderActiveFilterPills();
+
   const el=document.getElementById('facts-list');
   if(!facts.length){el.innerHTML=emptyState('📝','No facts yet','Tap Sync to pull from your sheet.');return;}
   if(!list.length){el.innerHTML=emptyState('🔍','No matches','Adjust search or filters.');return;}
@@ -673,16 +723,37 @@ function renderFacts(){
     const title=get(f,'question')||get(f,'story')||'(untitled)';
     const cs=get(f,'cardStatus')||'';
     const ad=String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean);
+    const qr=qrEligible(f);
     return `<div class="item" onclick="openFact('${attr(id)}')">
       <div class="item-title">${esc(clip(title,140))}</div>
       <div class="item-meta">
         <span class="dot" style="background:${csColor(cs)}"></span><span>${esc(cs||'Unset')}</span>
         ${qualOk(f)?'<span class="badge b-done">Qualifies ✓</span>':''}
+        ${qr?'<span class="badge" style="background:#EAF0FD;color:#2B5FB8">QR ✓</span>':''}
         ${get(f,'bookTitle')?`<span>· ${esc(clip(get(f,'bookTitle'),30))}</span>`:''}
       </div>
       ${ad.length?`<div class="item-meta" style="margin-top:7px">${ad.map(d=>`<span class="badge b-deck">${esc(d)}</span>`).join('')}</div>`:''}
     </div>`;
   }).join('');
+}
+function renderActiveFilterPills(){
+  const src=val('ff-source'),deck=val('ff-deck'),ds=val('ff-deck-status'),qr=val('ff-qr');
+  const pills=[];
+  const DSL={assigned:'Has deck',unassigned:'No deck'};
+  const QRL={'eligible':'QR eligible','not-eligible':'Not QR eligible'};
+  if(src)pills.push({label:'Source: '+clip(src,22),clear:()=>{document.getElementById('ff-source').value='';renderFacts();}});
+  if(deck)pills.push({label:'Deck: '+clip(deck,22),clear:()=>{document.getElementById('ff-deck').value='';renderFacts();}});
+  if(ds)pills.push({label:DSL[ds]||ds,clear:()=>{document.getElementById('ff-deck-status').value='';renderFacts();}});
+  if(qr)pills.push({label:QRL[qr]||qr,clear:()=>{document.getElementById('ff-qr').value='';renderFacts();}});
+  const bar=document.getElementById('facts-active-filters');
+  if(!pills.length){bar.style.display='none';bar.innerHTML='';return;}
+  bar.style.display='block';
+  bar.innerHTML=`<div class="filter-pills">${pills.map((p,i)=>`<span class="f-pill">${esc(p.label)}<span class="px" data-i="${i}">×</span></span>`).join('')}<button class="chip" style="font-size:12px;padding:4px 11px" onclick="clearAllFactFilters()">Clear all</button></div>`;
+  bar.querySelectorAll('.px').forEach(x=>x.addEventListener('click',()=>pills[+x.dataset.i].clear()));
+}
+function clearAllFactFilters(){
+  ['ff-source','ff-deck','ff-deck-status','ff-qr'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  renderFacts();
 }
 
 /* fact editor — with searchable deck assignment (desktop parity) */
@@ -854,6 +925,10 @@ function bindDeckToggles(containerId){
 function refreshFilters(){
   // deck tag filter
   setSelect('df-tag','All tags',allTags().map(t=>[t,t]),val('df-tag'));
+  // facts source filter — unique book titles across all facts
+  const srcSet=new Set();
+  facts.forEach(f=>{const bt=get(f,'bookTitle');if(bt)srcSet.add(bt);});
+  setSelect('ff-source','All sources',[...srcSet].sort().map(s=>[s,s]),val('ff-source'));
   // facts deck filter — target + assigned deck names + deck titles
   const nameSet=new Set(decks.map(d=>d.title).filter(Boolean));
   facts.forEach(f=>{const td=get(f,'targetDeck');if(td)nameSet.add(td);String(get(f,'assignedDecks')||'').split('|').map(s=>s.trim()).filter(Boolean).forEach(n=>nameSet.add(n));});
